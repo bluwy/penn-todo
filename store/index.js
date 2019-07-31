@@ -18,14 +18,14 @@ export const mutations = {
     })
   },
   REMOVE_TODO (state, index) {
-    if (index >= 0 && index < state.todos.length) {
-      state.todos.splice(index, 1)
-    }
+    state.todos = state.todos.filter(todo => todo.index !== index)
   },
   SET_TODO_DONE (state, { index, val }) {
-    if (index >= 0 && index < state.todos.length) {
-      state.todos[index].done = val
-    }
+    state.todos.forEach((todo) => {
+      if (todo.index === index) {
+        todo.done = val
+      }
+    })
   }
 }
 
