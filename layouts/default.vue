@@ -1,55 +1,100 @@
 <template>
-  <div>
-    <nuxt />
+  <div class="bg-image h-screen">
+    <div class="h-screen flex justify-center items-center">
+      <div class="card md:rounded-lg md:shadow-lg">
+        <the-header />
+        <main class="flex-1 flex overflow-hidden">
+          <nuxt class="flex-1" />
+        </main>
+        <the-footer />
+      </div>
+    </div>
   </div>
 </template>
 
-<style>
+<script>
+import TheHeader from '~/components/TheHeader.vue'
+import TheFooter from '~/components/TheFooter.vue'
+
+export default {
+  components: {
+    TheHeader,
+    TheFooter
+  }
+}
+</script>
+
+<style lang="postcss">
 html {
-  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-size: 16px;
-  word-spacing: 1px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
+}
+
+*, *:before, *:after {
   box-sizing: border-box;
 }
 
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
-  margin: 0;
+a {
+  font-weight: 500;
+}
+a:hover, a:focus {
+  text-decoration: underline;
 }
 
-.button--green {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #3b8070;
-  color: #3b8070;
-  text-decoration: none;
-  padding: 10px 30px;
+.bg-image {
+  @apply bg-center bg-no-repeat bg-cover;
+  background-image: url('~assets/images/wallpaper.jpg');
 }
 
-.button--green:hover {
-  color: #fff;
-  background-color: #3b8070;
+.card {
+  @apply flex flex-col w-full h-full bg-gray-100 overflow-hidden;
+}
+@media (min-width: 768px) {
+  .card {
+    width: 500px;
+    min-height: 60%;
+    max-height: 80%;
+  }
 }
 
-.button--grey {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #35495e;
-  color: #35495e;
-  text-decoration: none;
-  padding: 10px 30px;
-  margin-left: 15px;
+.text-box {
+  @apply px-3 py-1 rounded border border-gray-500;
+  transition: all .2s cubic-bezier(.4, 0, .2, 1);
+}
+.text-box:hover, .text-box:focus {
+  @apply outline-none shadow-none border-purple-500;
 }
 
-.button--grey:hover {
-  color: #fff;
-  background-color: #35495e;
+.btn {
+  @apply px-3 py-1 rounded font-semibold;
+  transition: all .2s cubic-bezier(.4, 0, .2, 1);
+}
+
+.btn-outline {
+  @apply border border-purple-500 text-purple-500;
+}
+.btn-outline:hover {
+  @apply bg-purple-500 text-white;
+}
+
+.btn-icon {
+  @apply px-2;
+}
+
+.btn-text {
+  @apply text-gray-500;
+}
+.btn-text:hover {
+  @apply bg-purple-500 text-white;
+}
+
+.flex-sm {
+  @apply -mx-1;
+}
+.flex-sm > * {
+  @apply mx-1;
 }
 </style>
