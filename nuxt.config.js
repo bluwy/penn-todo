@@ -23,6 +23,7 @@ export default {
   ** Global CSS
   */
   css: [
+    '@/assets/css/fontello.css'
   ],
   /*
   ** Plugins to load before mounting the App
