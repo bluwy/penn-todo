@@ -1,3 +1,5 @@
+// Enable hot reload for Express
+import './api/index.js'
 
 export default {
   mode: 'spa',
@@ -61,5 +63,8 @@ export default {
     */
     extend (config, ctx) {
     }
-  }
+  },
+  serverMiddleware: [
+    '~/api/index.js'
+  ]
 }
