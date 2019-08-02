@@ -1,3 +1,6 @@
+/* eslint-disable import/first */
+require('dotenv').config()
+
 // Enable hot reload for Express
 import './api/index.js'
 
