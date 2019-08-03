@@ -1,6 +1,3 @@
-/* eslint-disable import/first */
-require('dotenv').config()
-
 // Enable hot reload for Express
 import './api/index.js'
 
@@ -34,6 +31,7 @@ export default {
   ** Plugins to load before mounting the App
   */
   plugins: [
+    { src: '~/plugins/nuxt-client-init.js', ssr: false }
   ],
   /*
   ** Nuxt.js dev-modules
@@ -49,7 +47,9 @@ export default {
   */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    // Doc: https://github.com/nuxt-community/dotenv-module
+    '@nuxtjs/dotenv'
   ],
   /*
   ** Axios module configuration
