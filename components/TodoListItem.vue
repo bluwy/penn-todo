@@ -1,14 +1,14 @@
 <template>
   <li class="flex flex-sm mb-2">
     <div class="flex items-center">
-      <v-checkbox v-model="todoDone" />
+      <v-checkbox :value="done" @input="setTodoDoneMethod" />
     </div>
     <div class="flex-grow flex items-center">
       <span class="text-lg">{{ title }}</span>
     </div>
     <button
       class="btn btn-text btn-icon"
-      @click="removeTodo(index)"
+      @click="removeTodo({ uid })"
     >
       <i class="icon-cancel" />
     </button>
@@ -24,6 +24,10 @@ export default {
     VCheckbox
   },
   props: {
+    uid: {
+      type: Number,
+      required: true
+    },
     title: {
       type: String,
       required: true
@@ -31,36 +35,20 @@ export default {
     done: {
       type: Boolean,
       default: false
-    },
-    index: {
-      type: Number,
-      required: true
     }
-  },
-  data () {
-    return {
-      todoDone: false
-    }
-  },
-  watch: {
-    done (val) {
-      this.todoDone = this.done
-    },
-    todoDone (val) {
-      this.setTodoDone({
-        index: this.index,
-        val
-      })
-    }
-  },
-  mounted () {
-    this.todoDone = this.done
   },
   methods: {
     ...mapActions([
       'removeTodo',
       'setTodoDone'
-    ])
+    ]),
+    setTodoDoneMethod (done) {
+      // This will dispatch done and update the prop's done
+      this.setTodoDone({
+        uid: this.uid,
+        done
+      })
+    }
   }
 }
 </script>

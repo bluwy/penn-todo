@@ -4,7 +4,7 @@
       type="checkbox"
       class="absolute opacity-0 w-full h-full cursor-pointer"
       :value="value"
-      @click="$emit('input', $event.target.checked)"
+      @click="$emit('input', !value)"
     >
     <i class="text-2xl" :class="value ? 'icon-ok-squared text-purple-600' : 'icon-check-empty text-gray-500'" />
   </span>

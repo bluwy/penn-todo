@@ -7,6 +7,7 @@
       type="text"
       name="add-todo"
       placeholder="Anything to do?"
+      maxlength="256"
       @keyup="todoKeyUp"
     >
     <button
@@ -33,7 +34,10 @@ export default {
     ]),
     addTodoMethod () {
       if (this.addTodoTitle) {
-        this.addTodo(this.addTodoTitle)
+        this.addTodo({
+          title: this.addTodoTitle,
+          done: false
+        })
         this.addTodoTitle = ''
       }
     },

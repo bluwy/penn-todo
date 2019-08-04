@@ -2,10 +2,10 @@
   <ul>
     <todo-list-item
       v-for="todo in todos"
-      :key="todo.index"
+      :key="todo.uid"
+      :uid="todo.uid"
       :title="todo.title"
       :done="todo.done"
-      :index="todo.index"
     />
     <li
       v-show="!todos || todos.length <= 0"
