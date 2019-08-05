@@ -13,7 +13,4 @@ app.all('*', (req, res) => {
   res.sendStatus(404)
 })
 
-export default {
-  path: '/api',
-  handler: app
-}
+export default app

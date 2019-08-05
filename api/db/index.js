@@ -5,10 +5,9 @@ import { Pool } from 'pg'
 require('dotenv').config()
 
 // Connection string from environment variables
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres@localhost:5432/postgres'
+const connectionString = process.env.NODE_ENV === 'test' ? process.env.DATABASE_URL_TEST : process.env.DATABASE_URL
 
 const pool = new Pool({ connectionString })
-pool.connect()
 
 export default {
   /**
@@ -42,5 +41,8 @@ export default {
    */
   queryNative (text, params, callback) {
     return pool.query(text, params, callback)
+  },
+  async end () {
+    await pool.end()
   }
 }

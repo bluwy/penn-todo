@@ -31,8 +31,11 @@ export const mutations = {
 export const actions = {
   nuxtClientInit ({ commit }) {
     this.$axios.$get('/todos')
-      .then((res) => {
-        commit('ADD_TODO_RANGE', { todos: res })
+      .then((data) => {
+        // data might be empty object if no todos
+        if (data.hasOwnProperty('todos')) {
+          commit('ADD_TODO_RANGE', { todos: data.todos })
+        }
       })
       .catch((err) => {
         console.log(err.message)
@@ -47,8 +50,8 @@ export const actions = {
     const index = getters.getTodoIndex(tempUid)
 
     await this.$axios.$post('/todos/add', { title, done })
-      .then((res) => {
-        const uid = res.uid
+      .then((data) => {
+        const uid = data.uid
         commit('UPDATE_TODO', {
           index,
           todo: { uid }
