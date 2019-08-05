@@ -6,5 +6,8 @@
       "@/*": ["./*"]
     }
   },
-  "exclude": ["node_modules", "dist", ".nuxt"]
+  "exclude": ["node_modules", "dist", ".nuxt"],
+  "typeAcquisition": {
+    "include": ["jest"]
+  }
 }

@@ -1,4 +1,7 @@
 module.exports = {
+  setupFiles: [
+    '<rootDir>/tests/setup.js'
+  ],
   moduleFileExtensions: [
     'js',
     'jsx',
@@ -14,7 +17,8 @@ module.exports = {
     '/node_modules/'
   ],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1'
+    '^@/(.*)$': '<rootDir>/$1',
+    '^~/(.*)$': '<rootDir>/$1'
   },
   snapshotSerializers: [
     'jest-serializer-vue'
