@@ -8,7 +8,7 @@
       name="add-todo"
       placeholder="Anything to do?"
       maxlength="256"
-      @keyup="todoKeyUp"
+      @keyup.enter="addTodoMethod"
     >
     <button
       class="btn btn-outline btn-icon"
@@ -39,11 +39,6 @@ export default {
           done: false
         })
         this.addTodoTitle = ''
-      }
-    },
-    todoKeyUp (evt) {
-      if (evt.keyCode === 13) {
-        this.addTodoMethod()
       }
     }
   }

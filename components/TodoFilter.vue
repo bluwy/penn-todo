@@ -7,7 +7,7 @@
         type="radio"
         name="filter-group"
         value="all"
-        :checked="filter === 'all'"
+        :checked="value === 'all'"
         @click="$emit('input', $event.target.value)"
       >
       <label class="radio-label" for="all">
@@ -21,7 +21,7 @@
         type="radio"
         name="filter-group"
         value="active"
-        :checked="filter === 'active'"
+        :checked="value === 'active'"
         @click="$emit('input', $event.target.value)"
       >
       <label class="radio-label" for="active">Active</label>
@@ -33,7 +33,7 @@
         type="radio"
         name="filter-group"
         value="done"
-        :checked="filter === 'done'"
+        :checked="value === 'done'"
         @click="$emit('input', $event.target.value)"
       >
       <label class="radio-label" for="done">Done</label>
@@ -48,19 +48,6 @@ export default {
       type: String,
       default: 'all'
     }
-  },
-  data () {
-    return {
-      filter: ''
-    }
-  },
-  watch: {
-    value (val) {
-      this.filter = val
-    }
-  },
-  mounted () {
-    this.filter = this.value
   }
 }
 </script>
