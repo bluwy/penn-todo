@@ -1,6 +1,6 @@
 module.exports = {
   setupFiles: [
-    '<rootDir>/tests/setup.js'
+    '<rootDir>/__tests__/setup.js'
   ],
   moduleFileExtensions: [
     'js',
@@ -24,7 +24,7 @@ module.exports = {
     'jest-serializer-vue'
   ],
   testMatch: [
-    '**/tests/unit/**/*.spec.(js|jsx|ts|tsx)|**/__tests__/*.(js|jsx|ts|tsx)'
+    '**/__tests__/**/*.spec.(js|jsx|ts|tsx)'
   ],
   testURL: 'http://localhost/',
   watchPlugins: [
