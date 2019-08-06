@@ -21,14 +21,13 @@ describe('Component TodoBar', () => {
   it('should not add todo if title is empty', () => {
     const wrapper = shallowMount(TodoBar, { store, localVue })
     wrapper.find('button').trigger('click')
-    expect(actions.addTodo).not.toHaveBeenCalled()
+    expect(actions.addTodo).not.toBeCalled()
   })
 
   it('should clear title when add todo', () => {
     const propsData = { addTodoTitle: '810' }
     const wrapper = shallowMount(TodoBar, { propsData, store, localVue })
     wrapper.find('button').trigger('click')
-    expect(actions.addTodo).toBeCalled()
     expect(wrapper.vm.addTodoTitle).toBe('')
   })
 
@@ -36,6 +35,6 @@ describe('Component TodoBar', () => {
     const methods = { addTodoMethod: jest.fn() }
     const wrapper = shallowMount(TodoBar, { methods, store, localVue })
     wrapper.find('input').trigger('keyup.enter')
-    expect(wrapper.vm.addTodoMethod).toBeCalled()
+    expect(methods.addTodoMethod).toBeCalled()
   })
 })

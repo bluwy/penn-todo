@@ -37,10 +37,9 @@ export default {
    * Direct call to node-postgres pool
    * @param {string} text Query text
    * @param {any[]} params Query parameters
-   * @param {(err: Error, result: QueryResult) => void} callback Callback after query
    */
-  queryNative (text, params, callback) {
-    return pool.query(text, params, callback)
+  queryNative (text, params) {
+    return pool.query(text, params)
   },
   async end () {
     await pool.end()

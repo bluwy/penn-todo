@@ -32,13 +32,13 @@ describe('Component TodoListItem', () => {
       // Replace store since store can't access wrapper
       setTodoDone: jest.fn(done => wrapper.setProps({ done }))
     })
-    wrapper.find(VCheckbox).vm.$emit('input', !wrapper.vm.done)
+    wrapper.find(VCheckbox).vm.$emit('input', true)
     expect(wrapper.vm.setTodoDone).toBeCalled()
     expect(wrapper.vm.done).toBeTruthy()
   })
 
   it('should remove todo when remove button clicked', () => {
-    const wrapper = shallowMount(TodoListItem, { propsData })
+    const wrapper = shallowMount(TodoListItem, { propsData, store, localVue })
     wrapper.find('button').trigger('click')
     expect(actions.removeTodo).toBeCalled()
   })
