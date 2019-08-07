@@ -6,6 +6,10 @@ import db from '~/api/db/index.js'
 // Axios response data is at res.data
 // Supertest response data is at res.body
 
+// Set timeout to 10sec since database query could be slow
+// Increase this if Jest slaps you with timeout errors
+jest.setTimeout(10000)
+
 describe('API Todos', () => {
   const testDatas = [
     {
