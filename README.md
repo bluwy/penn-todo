@@ -2,6 +2,8 @@
 
 > [WIP] **DO NOT** release to production.
 
+[![Build Status](https://travis-ci.org/BjornLuG/penn-todo.svg?branch=master)](https://travis-ci.org/BjornLuG/penn-todo)
+
 A todo app built on the PENN stack ([PostgreSQL](https://www.postgresql.org), [Express](https://expressjs.com/), [Nuxt](https://nuxtjs.org), [Node.js](https://nodejs.org)).
 
 ## Table of contents
@@ -87,6 +89,7 @@ $ npm run start
 * Redesign interface
 * Clear done todos
 * Email authentication
+* Dockerize project
 * Grouping todos
 * Arrangable todos
 * Online and offline mode
@@ -100,12 +103,12 @@ Feel free to send a pull request for new features or fix. Open an issue for any 
   <summary>What is PENN stack?</summary>
   The PENN stack is similar to the MEAN and MERN stacks. The only difference is that it uses PostgreSQL instead of MongoDB, and Nuxt(Vue) instead of React or Angular. It's an open-source stack too.
 </details>
-<br>
+
 <details>
   <summary>Is this todo app any special than the others?</summary>
   Currently, no. It's just a simple todo app with only a custom design. More features, such as authentication will be added too, so who knows it could be unique too :)
 </details>
-<br>
+
 <details>
   <summary>Why not just make a simple todo app?</summary>
   Like any other todo app, this project is meant for me to learn backend, simple CRUD and auth. A code review would be nice.
