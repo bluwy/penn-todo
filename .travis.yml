@@ -1,4 +1,10 @@
 language: node_js
 node_js:
   - "lts/*"
+env:
+  - DATABASE_URL_TEST=postgres://postgres@localhost:5432/travis_ci_test
 cache: npm
+services:
+  - postgresql
+before_script:
+  - psql -c 'CREATE DATABASE travis_ci_test;' -U postgres
