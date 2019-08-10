@@ -3,9 +3,10 @@
     <todo-header :title="title" />
     <todo-input class="p-3" @add-todo="addTodo" />
     <todo-toolbar
-      v-model="filter"
       class="px-3"
+      :filter="filter"
       :todo-amount="filterTodos('active').length"
+      @filter-change="filter = $event.value"
       @remove-todo-done="removeTodoDone"
     />
     <todo-list

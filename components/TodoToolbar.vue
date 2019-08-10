@@ -11,8 +11,8 @@
           type="radio"
           name="filter-group"
           value="all"
-          :checked="value === 'all'"
-          @click="$emit('input', $event.target.value)"
+          :checked="filter === 'all'"
+          @click="$emit('filter-change', { value: $event.target.value })"
         >
         <label class="radio-label" for="all">
           All
@@ -25,8 +25,8 @@
           type="radio"
           name="filter-group"
           value="active"
-          :checked="value === 'active'"
-          @click="$emit('input', $event.target.value)"
+          :checked="filter === 'active'"
+          @click="$emit('filter-change', { value: $event.target.value })"
         >
         <label class="radio-label" for="active">Active</label>
       </span>
@@ -37,8 +37,8 @@
           type="radio"
           name="filter-group"
           value="done"
-          :checked="value === 'done'"
-          @click="$emit('input', $event.target.value)"
+          :checked="filter === 'done'"
+          @click="$emit('filter-change', { value: $event.target.value })"
         >
         <label class="radio-label" for="done">Done</label>
       </span>
@@ -55,7 +55,7 @@
 <script>
 export default {
   props: {
-    value: {
+    filter: {
       type: String,
       default: 'all'
     },

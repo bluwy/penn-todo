@@ -81,7 +81,9 @@ export const actions = {
         commit('ADD_TODO', cacheTodo)
       })
   },
-  async removeTodoDone ({ commit, state, getters }) {
+  async removeTodoDone ({ commit, state }) {
+    if (state.todos.findIndex(todo => todo.done) < 0) { return }
+
     const cacheTodos = { ...state.todos }
 
     commit('SET_TODOS', {
