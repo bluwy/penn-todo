@@ -25,6 +25,9 @@ export const mutations = {
   },
   REMOVE_TODO (state, { index }) {
     state.todos.splice(index, 1)
+  },
+  SET_TODOS (state, { todos }) {
+    state.todos = todos
   }
 }
 
@@ -76,6 +79,20 @@ export const actions = {
         console.log(err.message)
         // Add back todo
         commit('ADD_TODO', cacheTodo)
+      })
+  },
+  async removeTodoDone ({ commit, state, getters }) {
+    const cacheTodos = { ...state.todos }
+
+    commit('SET_TODOS', {
+      todos: state.todos.filter(t => !t.done)
+    })
+
+    await this.$axios.$delete('/todos/done')
+      .catch((err) => {
+        console.log(err.message)
+        // Add back todos
+        commit('SET_TODOS', { todos: cacheTodos })
       })
   },
   async setTodoTitle ({ commit, state, getters }, { uid, title }) {

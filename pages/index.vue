@@ -1,32 +1,13 @@
 <template>
-  <div class="container flex flex-col my-3">
-    <todo-bar />
-    <todo-filter v-model="filter" class="my-3" />
-    <todo-list class="flex-1 overflow-x-hidden overflow-y-auto" :todos="filterTodos(filter)" />
-  </div>
+  <todo />
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import TodoBar from '~/components/TodoBar.vue'
-import TodoFilter from '~/components/TodoFilter.vue'
-import TodoList from '~/components/TodoList.vue'
+import Todo from '~/components/Todo.vue'
 
 export default {
   components: {
-    TodoBar,
-    TodoFilter,
-    TodoList
-  },
-  data () {
-    return {
-      filter: 'all'
-    }
-  },
-  computed: {
-    ...mapGetters([
-      'filterTodos'
-    ])
+    Todo
   }
 }
 </script>

@@ -1,26 +1,16 @@
 <template>
-  <div class="bg-image h-screen">
-    <div class="h-screen flex justify-center items-center">
-      <div class="card md:rounded-lg md:shadow-lg">
-        <the-header />
-        <main class="flex-1 flex overflow-hidden">
-          <nuxt class="flex-1" />
-        </main>
-        <the-footer />
-      </div>
+  <div class="bg-image flex justify-center items-center h-screen">
+    <div class="card md:rounded-lg md:shadow-lg">
+      <main class="flex-1 overflow-hidden">
+        <nuxt class="h-full" />
+      </main>
     </div>
   </div>
 </template>
 
 <script>
-import TheHeader from '~/components/TheHeader.vue'
-import TheFooter from '~/components/TheFooter.vue'
-
 export default {
-  components: {
-    TheHeader,
-    TheFooter
-  }
+
 }
 </script>
 
@@ -31,6 +21,7 @@ html {
   -webkit-text-size-adjust: 100%;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 
 *, *:before, *:after {
@@ -85,7 +76,7 @@ a:hover, a:focus {
 }
 
 .btn-text {
-  @apply text-gray-500;
+  @apply text-gray-600;
 }
 .btn-text:hover {
   @apply bg-purple-500 text-white;

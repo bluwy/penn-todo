@@ -3,19 +3,35 @@
     <input
       type="checkbox"
       class="absolute opacity-0 w-full h-full cursor-pointer"
-      :value="value"
-      @click="$emit('input', !value)"
+      v-bind="$attrs"
+      :checked="checked"
+      v-on="listeners"
     >
-    <i class="text-2xl" :class="value ? 'icon-ok-squared text-purple-600' : 'icon-check-empty text-gray-500'" />
+    <i class="text-2xl" :class="checked ? 'icon-ok-squared text-purple-600' : 'icon-check-empty text-gray-500'" />
   </span>
 </template>
 
 <script>
 export default {
+  inheritAttrs: false,
+  model: {
+    prop: 'checked',
+    event: 'change'
+  },
   props: {
-    value: {
+    checked: {
       type: Boolean,
       default: false
+    }
+  },
+  computed: {
+    listeners () {
+      return {
+        ...this.$listeners,
+        change: () => {
+          this.$emit('change', !this.checked)
+        }
+      }
     }
   }
 }

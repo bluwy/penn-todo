@@ -1,14 +1,14 @@
 <template>
   <li class="flex flex-sm mb-2">
     <div class="flex items-center">
-      <v-checkbox :value="done" @input="setTodoDoneMethod" />
+      <v-checkbox :checked="done" @change="$emit('set-todo-done', { done: $event })" />
     </div>
     <div class="flex-grow flex items-center">
-      <span class="text-lg">{{ title }}</span>
+      <span class="text-lg" :class="{ 'line-through text-gray-500': done }">{{ title }}</span>
     </div>
     <button
       class="btn btn-text btn-icon"
-      @click="removeTodo({ uid })"
+      @click="$emit('remove-todo')"
     >
       <i class="icon-cancel" />
     </button>
@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
 import VCheckbox from '~/components/VCheckbox.vue'
 
 export default {
@@ -24,10 +23,6 @@ export default {
     VCheckbox
   },
   props: {
-    uid: {
-      type: Number,
-      required: true
-    },
     title: {
       type: String,
       required: true
@@ -35,19 +30,6 @@ export default {
     done: {
       type: Boolean,
       default: false
-    }
-  },
-  methods: {
-    ...mapActions([
-      'removeTodo',
-      'setTodoDone'
-    ]),
-    setTodoDoneMethod (done) {
-      // This will dispatch done and update the prop's done
-      this.setTodoDone({
-        uid: this.uid,
-        done
-      })
     }
   }
 }

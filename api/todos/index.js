@@ -54,6 +54,11 @@ router.post('/todos/add', (req, res) => {
   }
 })
 
+router.delete('/todos/done', (req, res) => {
+  db.query('DELETE FROM todos WHERE done=$1', [true], res)
+  res.end()
+})
+
 router.delete('/todos/:uid', (req, res) => {
   const uid = req.params.uid
   db.query('DELETE FROM todos WHERE uid=$1', [uid], res)
