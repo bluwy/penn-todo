@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col">
     <todo-header :title="title" />
-    <todo-bar class="p-3" @add-todo="addTodo" />
-    <todo-filter
+    <todo-input class="p-3" @add-todo="addTodo" />
+    <todo-toolbar
       v-model="filter"
       class="px-3"
       :todo-amount="filterTodos('active').length"
@@ -20,15 +20,15 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import TodoHeader from '~/components/TodoHeader.vue'
-import TodoBar from '~/components/TodoBar.vue'
-import TodoFilter from '~/components/TodoFilter.vue'
+import TodoInput from '~/components/TodoInput.vue'
+import TodoToolbar from '~/components/TodoToolbar.vue'
 import TodoList from '~/components/TodoList.vue'
 
 export default {
   components: {
     TodoHeader,
-    TodoBar,
-    TodoFilter,
+    TodoInput,
+    TodoToolbar,
     TodoList
   },
   data () {
