@@ -28,8 +28,10 @@ export default {
   },
   methods: {
     addTodoHandler () {
-      this.$emit('add-todo', { title: this.todoTitle })
-      this.todoTitle = ''
+      if (this.todoTitle) {
+        this.$emit('add-todo', { title: this.todoTitle })
+        this.todoTitle = ''
+      }
     }
   }
 }

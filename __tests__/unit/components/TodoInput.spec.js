@@ -1,40 +1,33 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils'
-import Vuex from 'vuex'
+import { shallowMount } from '@vue/test-utils'
 import TodoInput from '~/components/TodoInput.vue'
 
-const localVue = createLocalVue()
-localVue.use(Vuex)
-
 describe('Component TodoInput', () => {
-  let actions
-  let store
-
-  beforeEach(() => {
-    actions = {
-      addTodo: jest.fn()
-    }
-    store = new Vuex.Store({
-      actions
-    })
-  })
-
-  it('should not add todo if title is empty', () => {
-    const wrapper = shallowMount(TodoInput, { store, localVue })
-    wrapper.find('button').trigger('click')
-    expect(actions.addTodo).not.toBeCalled()
-  })
-
-  it('should clear title when add todo', () => {
-    const propsData = { addTodoTitle: '810' }
-    const wrapper = shallowMount(TodoInput, { propsData, store, localVue })
-    wrapper.find('button').trigger('click')
-    expect(wrapper.vm.addTodoTitle).toBe('')
-  })
-
-  it('should try to add todo when keyup enter', () => {
-    const methods = { addTodoMethod: jest.fn() }
-    const wrapper = shallowMount(TodoInput, { methods, store, localVue })
+  it('should call handler when input keyup enter', () => {
+    const methods = { addTodoHandler: jest.fn() }
+    const wrapper = shallowMount(TodoInput, { methods })
     wrapper.find('input').trigger('keyup.enter')
-    expect(methods.addTodoMethod).toBeCalled()
+    expect(methods.addTodoHandler).toBeCalled()
+  })
+
+  it('should call handler when button click', () => {
+    const methods = { addTodoHandler: jest.fn() }
+    const wrapper = shallowMount(TodoInput, { methods })
+    wrapper.find('button').trigger('click')
+    expect(methods.addTodoHandler).toBeCalled()
+  })
+
+  it('should not emit add-todo if title is empty', () => {
+    const wrapper = shallowMount(TodoInput)
+    wrapper.find('button').trigger('click')
+    expect(wrapper.emitted('add-todo')).toBeFalsy()
+  })
+
+  it('should clear title after emit add-todo', () => {
+    const wrapper = shallowMount(TodoInput)
+    wrapper.setData({ todoTitle: '810' })
+    wrapper.find('button').trigger('click')
+    expect(wrapper.emitted('add-todo')).toBeTruthy()
+    expect(wrapper.emitted('add-todo')[0][0]).toEqual({ title: '810' })
+    expect(wrapper.vm.todoTitle).toBe('')
   })
 })

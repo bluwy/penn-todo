@@ -144,6 +144,18 @@ describe('API Todos', () => {
     })
   })
 
+  describe('DELETE /todos/done', () => {
+    it('should delete all done todos', async () => {
+      expect.assertions(3)
+      const res = await request(app).delete('/todos/done')
+      expect(res.status).toBe(200)
+      expect(res.body).toEqual({})
+
+      const res2 = await request(app).get('/todos')
+      expect(res2.body.todos).toHaveLength(1)
+    })
+  })
+
   describe('DELETE /todos/:uid', () => {
     it('should delete a todo', async () => {
       expect.assertions(3)
