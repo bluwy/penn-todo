@@ -13,12 +13,12 @@ jest.setTimeout(10000)
 describe('API Todos', () => {
   const testDatas = [
     {
-      uid: 1,
+      id: 1,
       title: 'Todo 1',
       done: false
     },
     {
-      uid: 2,
+      id: 2,
       title: 'Todo 2',
       done: true
     }
@@ -28,7 +28,7 @@ describe('API Todos', () => {
     await db.query(
       `CREATE TABLE todos
       (
-        uid SERIAL PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         title character varying(256) NOT NULL,
         done boolean NOT NULL
       )`
@@ -43,8 +43,8 @@ describe('API Todos', () => {
 
   afterEach(async () => {
     await db.query('DELETE FROM todos')
-    // Restart uid auto-incremnet sequence to start from 1 again
-    await db.query('ALTER SEQUENCE todos_uid_seq RESTART WITH 1')
+    // Restart id auto-incremnet sequence to start from 1 again
+    await db.query('ALTER SEQUENCE todos_id_seq RESTART WITH 1')
   })
 
   afterAll(async () => {
@@ -61,16 +61,16 @@ describe('API Todos', () => {
       expect(res.body.todos).toEqual(testDatas)
     })
 
-    it('should return nothing when no todos', async () => {
+    it('should return empty array when no todos', async () => {
       await db.query('DELETE FROM todos')
       expect.assertions(2)
       const res = await request(app).get('/todos')
-      expect(res.status).toBe(204)
-      expect(res.body).toEqual({})
+      expect(res.status).toBe(200)
+      expect(res.body).toEqual({ todos: [] })
     })
   })
 
-  describe('GET /todos/:uid', () => {
+  describe('GET /todos/:id', () => {
     it('should get one todo', async () => {
       expect.assertions(2)
       const res = await request(app).get('/todos/1')
@@ -86,7 +86,7 @@ describe('API Todos', () => {
     })
   })
 
-  describe('PUT /todos/title/:uid', () => {
+  describe('PUT /todos/title/:id', () => {
     it('should update todo title', async () => {
       expect.assertions(3)
       const res = await request(app).put('/todos/title/1').send({ title: '810' })
@@ -105,7 +105,7 @@ describe('API Todos', () => {
     })
   })
 
-  describe('PUT /todos/done/:uid', () => {
+  describe('PUT /todos/done/:id', () => {
     it('should update todo done', async () => {
       expect.assertions(3)
       const res = await request(app).put('/todos/done/1').send({ done: true })
@@ -129,8 +129,8 @@ describe('API Todos', () => {
       expect.assertions(3)
       const res = await request(app).post('/todos/add').send({ title: '810', done: false })
       expect(res.status).toBe(200)
-      // Return incremented uid, which should be 3
-      expect(res.body).toEqual({ uid: 3 })
+      // Return incremented id, which should be 3
+      expect(res.body).toEqual({ id: 3 })
 
       const res2 = await request(app).get('/todos')
       expect(res2.body.todos).toHaveLength(3)
@@ -156,7 +156,7 @@ describe('API Todos', () => {
     })
   })
 
-  describe('DELETE /todos/:uid', () => {
+  describe('DELETE /todos/:id', () => {
     it('should delete a todo', async () => {
       expect.assertions(3)
       const res = await request(app).delete('/todos/1')

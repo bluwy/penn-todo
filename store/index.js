@@ -1,20 +1,20 @@
 import Vue from 'vue'
 
 export const state = () => ({
-  // Auto decrement so doesn't crash with database uid
-  tempUid: -1,
+  // Auto decrement so doesn't crash with database id
+  tempId: -1,
   todos: []
 })
 
 export const mutations = {
-  ADD_TODO (state, { uid, title, done }) {
-    state.todos.push({ uid, title, done })
+  ADD_TODO (state, { id, title, done }) {
+    state.todos.push({ id, title, done })
   },
-  // Temporarily assigns a todo with temp uid
-  // Used by addTodo to later update uid was request done
+  // Temporarily assigns a todo with temp id
+  // Used by addTodo to later update id was request done
   ADD_TEMP_TODO (state, { title, done }) {
-    const uid = state.tempUid--
-    state.todos.push({ uid, title, done })
+    const id = state.tempId--
+    state.todos.push({ id, title, done })
   },
   ADD_TODO_RANGE (state, { todos }) {
     state.todos.push(...todos)
@@ -44,22 +44,22 @@ export const actions = {
         console.log(err.message)
       })
   },
-  // Returns todo uid after add
+  // Returns todo id after add
   async addTodo ({ commit, state, getters }, { title, done }) {
-    // Cache temp uid, when add temp todo, state's tempUid will auto decrement
-    const tempUid = state.tempUid
+    // Cache temp id, when add temp todo, state's tempId will auto decrement
+    const tempId = state.tempId
     commit('ADD_TEMP_TODO', { title, done })
 
-    const index = getters.getTodoIndex(tempUid)
+    const index = getters.getTodoIndex(tempId)
 
     await this.$axios.$post('/todos/add', { title, done })
       .then((data) => {
-        const uid = data.uid
+        const id = data.id
         commit('UPDATE_TODO', {
           index,
-          todo: { uid }
+          todo: { id }
         })
-        return uid
+        return id
       })
       .catch((err) => {
         console.log(err.message)
@@ -67,14 +67,14 @@ export const actions = {
         commit('REMOVE_TODO', { index })
       })
   },
-  async removeTodo ({ commit, state, getters }, { uid }) {
-    const index = getters.getTodoIndex(uid)
+  async removeTodo ({ commit, state, getters }, { id }) {
+    const index = getters.getTodoIndex(id)
     if (index < 0) { return }
 
     const cacheTodo = state.todos[index]
 
     commit('REMOVE_TODO', { index })
-    await this.$axios.$delete('/todos/' + uid)
+    await this.$axios.$delete('/todos/' + id)
       .catch((err) => {
         console.log(err.message)
         // Add back todo
@@ -97,8 +97,8 @@ export const actions = {
         commit('SET_TODOS', { todos: cacheTodos })
       })
   },
-  async setTodoTitle ({ commit, state, getters }, { uid, title }) {
-    const index = getters.getTodoIndex(uid)
+  async setTodoTitle ({ commit, state, getters }, { id, title }) {
+    const index = getters.getTodoIndex(id)
     if (index < 0) { return }
 
     const cacheTitle = state.todos[index].title
@@ -108,7 +108,7 @@ export const actions = {
       todo: { title }
     })
 
-    await this.$axios.$put('/todos/title/' + uid, { title })
+    await this.$axios.$put('/todos/title/' + id, { title })
       .catch((err) => {
         console.log(err)
         // Revert title
@@ -118,8 +118,8 @@ export const actions = {
         })
       })
   },
-  async setTodoDone ({ commit, state, getters }, { uid, done }) {
-    const index = getters.getTodoIndex(uid)
+  async setTodoDone ({ commit, state, getters }, { id, done }) {
+    const index = getters.getTodoIndex(id)
     if (index < 0) { return }
 
     const cacheDone = state.todos[index].done
@@ -129,7 +129,7 @@ export const actions = {
       todo: { done }
     })
 
-    await this.$axios.$put('/todos/done/' + uid, { done: done.toString() })
+    await this.$axios.$put('/todos/done/' + id, { done: done.toString() })
       .catch((err) => {
         console.log(err)
         // Revert done
@@ -154,7 +154,7 @@ export const getters = {
         return state.todos
     }
   },
-  getTodoIndex: state => (uid) => {
-    return state.todos.findIndex(todo => todo.uid === uid)
+  getTodoIndex: state => (id) => {
+    return state.todos.findIndex(todo => todo.id === id)
   }
 }

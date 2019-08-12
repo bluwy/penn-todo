@@ -3,11 +3,11 @@
     <ul class="h-full overflow-x-hidden">
       <todo-list-item
         v-for="todo in todos"
-        :key="todo.uid"
+        :key="todo.id"
         :title="todo.title"
         :done="todo.done"
-        @set-todo-done="$emit('set-todo-done', { ...$event, uid: todo.uid })"
-        @remove-todo="$emit('remove-todo', { uid: todo.uid })"
+        @set-todo-done="$emit('set-todo-done', { ...$event, id: todo.id })"
+        @remove-todo="$emit('remove-todo', { id: todo.id })"
       />
       <li
         v-show="!todos || todos.length <= 0"

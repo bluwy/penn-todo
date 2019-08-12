@@ -5,12 +5,12 @@ import TodoListItem from '~/components/TodoListItem.vue'
 describe('Component TodoList', () => {
   const testDatas = [
     {
-      uid: 1,
+      id: 1,
       title: 'Todo 1',
       done: false
     },
     {
-      uid: 2,
+      id: 2,
       title: 'Todo 2',
       done: true
     }
