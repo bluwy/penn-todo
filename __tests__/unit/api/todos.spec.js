@@ -25,7 +25,7 @@ describe('API Todos', () => {
   ]
 
   beforeAll(async () => {
-    await db.queryNative(
+    await db.query(
       `CREATE TABLE todos
       (
         uid SERIAL PRIMARY KEY,
@@ -37,18 +37,18 @@ describe('API Todos', () => {
 
   beforeEach(async () => {
     for (const data of testDatas) {
-      await db.queryNative('INSERT INTO todos (title, done) VALUES ($1, $2)', [data.title, data.done])
+      await db.query('INSERT INTO todos (title, done) VALUES ($1, $2)', [data.title, data.done])
     }
   })
 
   afterEach(async () => {
-    await db.queryNative('DELETE FROM todos')
+    await db.query('DELETE FROM todos')
     // Restart uid auto-incremnet sequence to start from 1 again
-    await db.queryNative('ALTER SEQUENCE todos_uid_seq RESTART WITH 1')
+    await db.query('ALTER SEQUENCE todos_uid_seq RESTART WITH 1')
   })
 
   afterAll(async () => {
-    await db.queryNative('DROP TABLE todos')
+    await db.query('DROP TABLE todos')
     await db.end()
   })
 
@@ -62,7 +62,7 @@ describe('API Todos', () => {
     })
 
     it('should return nothing when no todos', async () => {
-      await db.queryNative('DELETE FROM todos')
+      await db.query('DELETE FROM todos')
       expect.assertions(2)
       const res = await request(app).get('/todos')
       expect(res.status).toBe(204)

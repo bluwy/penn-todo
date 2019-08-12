@@ -11,35 +11,41 @@ const pool = new Pool({ connectionString })
 
 export default {
   /**
-   * Query database and auto handle failed queries
+   * Query DB
    * @param {string} text Query text
    * @param {any[]} params Query parameters
-   * @param {Response} response Express response
-   * @param {(result: QueryResult) => void} callback Callback query result if it's not empty
-   * @param {boolean} force Force callback even if result is empty
    */
-  query (text, params, response, callback, force) {
-    return pool.query(text, params, (err, result) => {
-      if (err) {
-        // Server error
-        response.sendStatus(500)
-      } else if (callback) {
-        if (result.rows.length > 0 || force) {
-          callback(result)
-        } else {
-          // No data found
-          response.sendStatus(204)
-        }
-      }
-    })
+  query (text, params) {
+    return pool.query(text, params)
   },
   /**
-   * Direct call to node-postgres pool
+   * Query DB for Express APIs. Auto handles errors.
    * @param {string} text Query text
    * @param {any[]} params Query parameters
+   * @param {Response} res Express response
+   * @param {(result) => void} cb Callback if query succeed and meet conditions from `options`
+   * @param {{}} options Extra options to check before invoking callback
    */
-  queryNative (text, params) {
-    return pool.query(text, params)
+  async queryApi (text, params, res, cb = null, options = null) {
+    await pool.query(text, params)
+      .then(async (result) => {
+        if (cb) {
+          let stopCb
+
+          if (options) {
+            if (options.atLeastOneRow && result.rowCount < 0) {
+              res.status(204).send(new Error('Query result is empty'))
+              stopCb = true
+            }
+          }
+
+          if (!stopCb) {
+            await cb(result)
+          }
+        }
+      })
+      .catch(e => res.status(500).send(e))
+      .finally(() => res.end())
   },
   async end () {
     await pool.end()
