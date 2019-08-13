@@ -33,7 +33,7 @@ export const mutations = {
 
 export const actions = {
   nuxtClientInit ({ commit }) {
-    this.$axios.$get('/todos')
+    this.$axios.$get('/todos/')
       .then((data) => {
         // data might be empty object if no todos
         if (data.hasOwnProperty('todos')) {

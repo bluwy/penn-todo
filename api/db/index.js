@@ -33,7 +33,7 @@ export default {
           let stopCb
 
           if (options) {
-            if (options.atLeastOneRow && result.rowCount < 0) {
+            if (options.atLeastOneRow && result.rowCount <= 0) {
               res.status(204).send(new Error('Query result is empty'))
               stopCb = true
             }
