@@ -29,6 +29,7 @@ html {
 }
 
 a {
+  @apply text-purple-600;
   font-weight: 500;
 }
 a:hover, a:focus {
@@ -57,6 +58,10 @@ a:hover, a:focus {
 }
 .text-box:hover, .text-box:focus {
   @apply outline-none shadow-none border-purple-500;
+}
+
+.error-box {
+  @apply p-3 my-3 text-white bg-red-500 rounded text-center;
 }
 
 .btn {

@@ -1,6 +1,9 @@
 <template>
   <div class="flex flex-col">
-    <todo-header :title="title" />
+    <todo-header
+      :title="title"
+      @close="$store.dispatch('auth/logout')"
+    />
     <todo-input class="p-3" @add-todo="addTodo" />
     <todo-toolbar
       class="px-3"
@@ -19,11 +22,13 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { createNamespacedHelpers } from 'vuex'
 import TodoHeader from '~/components/TodoHeader.vue'
 import TodoInput from '~/components/TodoInput.vue'
 import TodoToolbar from '~/components/TodoToolbar.vue'
 import TodoList from '~/components/TodoList.vue'
+
+const { mapGetters, mapActions } = createNamespacedHelpers('todos')
 
 export default {
   components: {

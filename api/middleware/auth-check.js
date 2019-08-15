@@ -1,20 +1,21 @@
-import jwt from 'jsonwebtoken'
+import auth from '../auth'
 
-export default (req, res, next) => {
+export default async (req, res, next) => {
   const token = req.header('Authorization')
 
   if (token) {
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET)
-      req.locals.authed = true
-      req.locals.userId = decoded.userId
-      next()
-    } catch (e) {
-      res.status(401).send(e)
-      req.locals.authed = false
-    }
+    await auth.verifyJwt(token)
+      .then((dec) => {
+        req.locals.authed = true
+        req.locals.userId = dec.userId
+        next()
+      })
+      .catch((e) => {
+        req.locals.authed = false
+        res.status(401).send(e)
+      })
   } else {
-    res.status(401).send(new Error('No token supplied'))
     req.locals.authed = false
+    res.status(401).send(new Error('No token supplied'))
   }
 }

@@ -1,8 +1,16 @@
 <template>
   <header class="bg-gradient px-3 py-1 text-white">
-    <h1 class="font-semibold">
-      {{ title }}
-    </h1>
+    <div class="flex justify-between">
+      <h1 class="font-semibold">
+        {{ title }}
+      </h1>
+      <button
+        class="font-semibold"
+        @click="$emit('close')"
+      >
+        Close
+      </button>
+    </div>
   </header>
 </template>
 

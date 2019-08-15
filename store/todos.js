@@ -7,6 +7,9 @@ export const state = () => ({
 })
 
 export const mutations = {
+  SET_TODOS (state, { todos }) {
+    state.todos = todos
+  },
   ADD_TODO (state, { id, title, done }) {
     state.todos.push({ id, title, done })
   },
@@ -16,29 +19,24 @@ export const mutations = {
     const id = state.tempId--
     state.todos.push({ id, title, done })
   },
-  ADD_TODO_RANGE (state, { todos }) {
-    state.todos.push(...todos)
-  },
   UPDATE_TODO (state, { index, todo }) {
     // Can't set state.todos[index] directly, reactivity doesn't work that way
     Vue.set(state.todos, index, { ...state.todos[index], ...todo })
   },
   REMOVE_TODO (state, { index }) {
     state.todos.splice(index, 1)
-  },
-  SET_TODOS (state, { todos }) {
-    state.todos = todos
   }
 }
 
 export const actions = {
-  nuxtClientInit ({ commit }) {
-    this.$axios.$get('/todos/')
+  // Fetch on page fetch
+  async fetchTodos ({ commit, getters }) {
+    if (!getters.isAuthed) { return }
+
+    await this.$axios.$get('/todos/', { headers: { 'Authorization': getters.authHeader } })
       .then((data) => {
-        // data might be empty object if no todos
-        if (data.hasOwnProperty('todos')) {
-          commit('ADD_TODO_RANGE', { todos: data.todos })
-        }
+        const todos = data.todos || []
+        commit('SET_TODOS', { todos })
       })
       .catch((err) => {
         console.log(err.message)
@@ -46,13 +44,15 @@ export const actions = {
   },
   // Returns todo id after add
   async addTodo ({ commit, state, getters }, { title, done }) {
+    if (!getters.isAuthed) { return }
+
     // Cache temp id, when add temp todo, state's tempId will auto decrement
     const tempId = state.tempId
     commit('ADD_TEMP_TODO', { title, done })
 
     const index = getters.getTodoIndex(tempId)
 
-    await this.$axios.$post('/todos/add', { title, done })
+    await this.$axios.$post('/todos/add', { title, done }, { headers: { 'Authorization': getters.authHeader } })
       .then((data) => {
         const id = data.id
         commit('UPDATE_TODO', {
@@ -68,20 +68,23 @@ export const actions = {
       })
   },
   async removeTodo ({ commit, state, getters }, { id }) {
+    if (!getters.isAuthed) { return }
+
     const index = getters.getTodoIndex(id)
     if (index < 0) { return }
 
     const cacheTodo = state.todos[index]
 
     commit('REMOVE_TODO', { index })
-    await this.$axios.$delete('/todos/' + id)
+    await this.$axios.$delete('/todos/' + id, { headers: { 'Authorization': getters.authHeader } })
       .catch((err) => {
         console.log(err.message)
         // Add back todo
         commit('ADD_TODO', cacheTodo)
       })
   },
-  async removeTodoDone ({ commit, state }) {
+  async removeTodoDone ({ commit, state, getters }) {
+    if (!getters.isAuthed) { return }
     if (state.todos.findIndex(todo => todo.done) < 0) { return }
 
     const cacheTodos = { ...state.todos }
@@ -90,7 +93,7 @@ export const actions = {
       todos: state.todos.filter(t => !t.done)
     })
 
-    await this.$axios.$delete('/todos/done')
+    await this.$axios.$delete('/todos/done', { headers: { 'Authorization': getters.authHeader } })
       .catch((err) => {
         console.log(err.message)
         // Add back todos
@@ -98,6 +101,8 @@ export const actions = {
       })
   },
   async setTodoTitle ({ commit, state, getters }, { id, title }) {
+    if (!getters.isAuthed) { return }
+
     const index = getters.getTodoIndex(id)
     if (index < 0) { return }
 
@@ -108,7 +113,7 @@ export const actions = {
       todo: { title }
     })
 
-    await this.$axios.$put('/todos/title/' + id, { title })
+    await this.$axios.$put('/todos/title/' + id, { title }, { headers: { 'Authorization': getters.authHeader } })
       .catch((err) => {
         console.log(err)
         // Revert title
@@ -119,6 +124,8 @@ export const actions = {
       })
   },
   async setTodoDone ({ commit, state, getters }, { id, done }) {
+    if (!getters.isAuthed) { return }
+
     const index = getters.getTodoIndex(id)
     if (index < 0) { return }
 
@@ -129,7 +136,7 @@ export const actions = {
       todo: { done }
     })
 
-    await this.$axios.$put('/todos/done/' + id, { done: done.toString() })
+    await this.$axios.$put('/todos/done/' + id, { done: done.toString() }, { headers: { 'Authorization': getters.authHeader } })
       .catch((err) => {
         console.log(err)
         // Revert done
@@ -142,6 +149,12 @@ export const actions = {
 }
 
 export const getters = {
+  isAuthed (state, getters, rootState, rootGetters) {
+    return rootGetters['auth/isAuthed']
+  },
+  authHeader (state, getters, rootState) {
+    return rootState.auth.token
+  },
   filterTodos: state => (filter) => {
     switch (filter) {
       case 'all':
