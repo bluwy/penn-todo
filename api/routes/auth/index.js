@@ -8,8 +8,9 @@ const router = new Router()
 
 // Manage send token and end response
 async function sendJwtToken (res, previlage, userId) {
-  await auth.signJwt({ previlage, userId }, { expiresIn: '12h' })
-    .then(token => res.json({ token }))
+  const payload = { previlage, userId }
+  await auth.signJwt(payload, { expiresIn: '12h' })
+    .then(token => res.json({ payload, token }))
     .catch(e => res.status(401).send(e))
     .finally(() => res.end())
 }
@@ -49,6 +50,19 @@ router.post('/login', async (req, res) => {
     })
   } else {
     res.status(400).send(new Error('Data "email" or "password" is null or empty'))
+  }
+})
+
+router.post('/check', async (req, res) => {
+  const { token } = req.body
+
+  if (token) {
+    await auth.verifyJwt(token)
+      .then(dec => res.json(dec))
+      .catch(e => res.status(401).send(e))
+      .finally(() => res.end())
+  } else {
+    res.status(400).send(new Error('Data "token" is null or empty'))
   }
 })
 
