@@ -1,6 +1,6 @@
 # PENN Todo
 
-> [WIP] **DO NOT** release to production.
+> [WIP] **DO NOT release to production**
 
 [![Build Status](https://travis-ci.org/BjornLuG/penn-todo.svg?branch=master)](https://travis-ci.org/BjornLuG/penn-todo)
 
@@ -21,14 +21,13 @@ The todo app is a Nuxt-Express hybrid scaffolded with [create-nuxt-app](https://
 
 Express acts as the server middleware for Nuxt, so Nuxt will redirect api calls for Express to handle.
 
-Express does CRUD operations on a PostgreSQL database. Auth is yet to be implemented, so currently todos are public to everyone. (Not ready for production)
+Express does CRUD operations on a PostgreSQL database. Authentication is needed to do so, and is based on JSON Web Token (JWT).
 
 Jest is used for unit testing, **all** tests are located in `__todos__` folder.
 
 ## Development state
 
-Currently, the todo app is fully functional. It interacts with the backend and database well. Basic CRUD operations works. The only downside is that there's no limit to how many todos can be added. Spam bots galore! (Not ready for production)
-
+Currently, the todo app works. Frontend and backend works well. It only lacks more authentication functionalities, such as sending emails, resetting passwords and editing profile. UI might need a reiteration.
 
 ## Installation
 
@@ -47,14 +46,18 @@ $ npm run install
 
 The project uses [dotenv](https://github.com/motdotla/dotenv) to inject environment variables, a `.env` file is required before developing. Create one and place it in the root folder:
 ``` ini
-DATABASE_URL=<protocol>://<name>:<password>@<host>:<port>/<dbname>
-DATABASE_URL_TEST=<protocol>://<name>:<password>@<host>:<port>/<dbname>
-API_URL_BROWSER=http://localhost:3000/api
-```
-> `DATABASE_URL` and `DATABASE_URL_TEST` should be replaced accordingly, e.g.
-`postgres://john:12345678@localhost:5432/tododb` and `postgres://john:12345678@localhost:5432/todotestdb`
+; Prod/dev database url, e.g. postgres://john:12345678@localhost:5432/tododb
+DATABASE_URL=
 
-> `API_URL_BROWSER` is used by Nuxt for Axios' baseUrl, `/api` is where the server is hosted. You don't have to change this value unless needed.
+; Testing database url, e.g. postgres://john:12345678@localhost:5432/todotestdb
+DATABASE_URL_TEST=
+
+; Backend api url,  used by Nuxt for Axios' `baseUrl`. You can leave the value below as is.
+API_URL_BROWSER=http://localhost:3000/api
+
+; Secret string used for JWT hashing
+JWT_SECRET=
+```
 
 To run dev server (This starts Nuxt and Express servers):
 ``` bash
@@ -86,10 +89,19 @@ $ npm run start
 
 ## Roadmap
 
-* Redesign interface
+:heavy_check_mark: Done 
+* Redesign interface 
 * Clear done todos
 * Email authentication
+
+:blue_book: Todo
+* Refactor components
+* Settings menu
+  * Edit profile
+  * Manage auth
 * Dockerize project
+
+:x: Cancelled
 * Grouping todos
 * Arrangable todos
 * Online and offline mode
@@ -101,17 +113,12 @@ Feel free to send a pull request for new features or fix. Open an issue for any 
 
 <details>
   <summary>What is PENN stack?</summary>
-  The PENN stack is similar to the MEAN and MERN stacks. The only difference is that it uses PostgreSQL instead of MongoDB, and Nuxt(Vue) instead of React or Angular. It's an open-source stack too.
+  The PENN stack is similar to the MEAN and MERN stacks. The only difference is that it uses PostgreSQL instead of MongoDB, and Nuxt (Vue) instead of React or Angular. It's an open-source stack too.
 </details>
 
 <details>
   <summary>Is this todo app any special than the others?</summary>
-  Currently, no. It's just a simple todo app with only a custom design. More features, such as authentication will be added too, so who knows it could be unique too :)
-</details>
-
-<details>
-  <summary>Why not just make a simple todo app?</summary>
-  Like any other todo app, this project is meant for me to learn backend, simple CRUD and auth. A code review would be nice.
+  Currently, no. It's just a simple todo app with only a custom design. It's only meant for me to learn backend, simple CRUD and auth, so it's not much of a production-ready app. A code review would be nice :)
 </details>
 
 ## License
