@@ -7,4 +7,10 @@ describe('Component TodoHeader', () => {
     const wrapper = shallowMount(TodoHeader, { propsData })
     expect(wrapper.find('h1').text()).toBe(propsData.title)
   })
+
+  it('should emit close when click close', () => {
+    const wrapper = shallowMount(TodoHeader)
+    wrapper.find('button').trigger('click')
+    expect(wrapper.emitted('close')).toBeTruthy()
+  })
 })
