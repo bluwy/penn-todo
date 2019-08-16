@@ -21,7 +21,7 @@ router.post('/signup', async (req, res) => {
   if (name && email && password) {
     await db.queryApi('SELECT * FROM users WHERE email=$1', [email], res, async (result) => {
       // Make sure doesn't have existing account
-      if (result.rows.length <= 0) {
+      if (result.rowCount <= 0) {
         const salt = 'bf'
         await db.queryApi('INSERT INTO users (name, email, hash) VALUES ($1, $2, crypt($3, gen_salt($4))) RETURNING id', [name, email, password, salt], res, async (result2) => {
           // Send JWT
@@ -41,7 +41,7 @@ router.post('/login', async (req, res) => {
 
   if (email && password) {
     await db.queryApi('SELECT id, hash=crypt($1, hash) AS match FROM users WHERE email=$2', [password, email], res, async (result) => {
-      if (result.rows.length > 0 && result.rows[0].match) {
+      if (result.rowCount > 0 && result.rows[0].match) {
         // Send JWT
         await sendJwtToken(res, 'basic', result.rows[0].id)
       } else {
@@ -71,12 +71,14 @@ router.post('/forgot', async (req, res) => {
 
   if (email) {
     await db.queryApi('SELECT name FROM users WHERE email=$1', [email], res, async (result) => {
-      if (result.rows.length > 0) {
+      if (result.rowCount > 0) {
+        const token = await auth.signJwt({ email }, { expiresIn: '1h' })
+
         // Send email
         const acc = await nm.createTestAccount()
 
         const transporter = nm.createTransport({
-          host: 'stmp.ethereal.email',
+          host: 'smtp.ethereal.email',
           port: 587,
           secure: false,
           auth: {
@@ -86,21 +88,36 @@ router.post('/forgot', async (req, res) => {
         })
 
         const info = await transporter.sendMail({
-          from: 'Blu',
-          to: 'boom@bard.com',
-          subject: 'Test',
-          text: 'Hello?',
-          html: `<h1>Forgot password, ${result.rows[0].name}?</h1>`
+          from: 'no-reply@example.com',
+          to: email,
+          subject: 'Penn Todo: Reset password',
+          html: `<p>Hello ${result.rows[0].name},</p><p>Click <a href="https://${req.headers.host}/reset?token=${token}">this link</a> to reset password.</p><p>If you did not request a password reset, please ignore this email.</p><p>Regards, Penn Todo team.`
         })
 
-        console.log('Email sent: ', info.messageId)
-        console.log('Email preview: ', nm.getTestMessageUrl(info))
+        res.json({ preview: nm.getTestMessageUrl(info) })
       } else {
         res.status(401).send(new Error('Email is not registered'))
       }
     })
   } else {
     res.status(400).send(new Error('Data "email" is null or empty'))
+  }
+})
+
+router.post('/reset', async (req, res) => {
+  const { token = null, password = null } = req.body
+
+  if (token && password) {
+    await auth.verifyJwt(token)
+      .then(async (dec) => {
+        const salt = 'bf'
+        await db.queryApi('UPDATE users SET hash=crypt($1, gen_salt($2)) WHERE email=$3', [password, salt, dec.email], res)
+      })
+      .catch((e) => {
+        res.status(401).send(e)
+      })
+  } else {
+    res.status(400).send(new Error('Data "token" or "password" is null or empty'))
   }
 })
 

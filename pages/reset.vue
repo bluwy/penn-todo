@@ -2,27 +2,27 @@
   <div class="p-3">
     <div class="flex flex-col h-full overflow-y-auto">
       <h1 class="my-3 text-3xl font-bold text-center">
-        Forgot Password
+        Reset Password
       </h1>
-      <span class="my-3 text-center">Enter your email below to send a "reset password" email</span>
+      <span class="my-3 text-center">Almost there! Enter your new password and voila~</span>
       <span v-show="errorMessage" class="error-box">{{ errorMessage }}</span>
       <form ref="form" @submit.prevent="submit">
         <div>
-          <label for="email">Email</label>
+          <label for="password">New password</label>
           <br>
           <input
-            id="email"
-            v-model="email"
+            id="password"
+            v-model="password"
             class="text-box w-full mb-3"
-            type="email"
-            name="email"
-            autocomplete="email"
+            type="password"
+            name="password"
+            autocomplete="password"
             required
           >
         </div>
         <div class="text-right">
           <button class="btn btn-outline" type="submit">
-            Send
+            Change
           </button>
         </div>
       </form>
@@ -40,24 +40,27 @@ import { createNamespacedHelpers } from 'vuex'
 const { mapActions } = createNamespacedHelpers('auth')
 
 export default {
+  middleware ({ query, redirect }) {
+    if (!query.token) {
+      redirect('/forgot')
+    }
+  },
   data () {
     return {
-      email: '',
+      password: '',
       errorMessage: ''
     }
   },
   methods: {
     ...mapActions([
-      'forgot'
+      'reset'
     ]),
     async submit () {
       if (this.$refs.form.checkValidity()) {
-        await this.forgot({
-          email: this.email
+        await this.reset({
+          token: this.$route.query.token,
+          password: this.password
         })
-          .then((preview) => {
-            this.errorMessage = 'Preview email at ' + preview
-          })
       }
     }
   }

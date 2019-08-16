@@ -69,12 +69,23 @@ export const actions = {
     commit('SET_USER_DATA', { data: null })
     this.$router.push('/login')
   },
-  async forgot ({ getters }, { email }) {
+  forgot ({ getters }, { email }) {
     if (getters.isAuthed) { return }
 
-    await this.$axios.$post('/auth/forgot', { email })
+    return this.$axios.$post('/auth/forgot', { email })
+      .then((data) => {
+        return data.preview
+      })
+      .catch((err) => {
+        console.log(err.message)
+      })
+  },
+  async reset ({ getters }, { token, password }) {
+    if (getters.isAuthed) { return }
+
+    await this.$axios.$post('/auth/reset', { token, password })
       .then(() => {
-        console.log('Email sent')
+        this.$router.push('/login')
       })
       .catch((err) => {
         console.log(err.message)
