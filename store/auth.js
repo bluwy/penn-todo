@@ -30,39 +30,32 @@ export const actions = {
         .then((data) => {
           commit('SET_USER_DATA', { data })
         })
-        .catch((err) => {
-          console.log(err.message)
-        })
     }
   },
-  async signup ({ commit, getters }, { name, email, password }) {
+  signup ({ commit, getters }, { name, email, password }) {
     if (getters.isAuthed) { return }
 
-    await this.$axios.$post('/auth/signup', { name, email, password })
+    return this.$axios.$post('/auth/signup', { name, email, password })
       .then((data) => {
         const token = data.token
         const payload = data.payload
         commit('SET_TOKEN', { token })
         commit('SET_USER_DATA', { data: payload })
         this.$router.push('/')
-      })
-      .catch((err) => {
-        console.log(err.message)
+        return data
       })
   },
-  async login ({ commit, getters }, { email, password }) {
+  login ({ commit, getters }, { email, password }) {
     if (getters.isAuthed) { return }
 
-    await this.$axios.$post('/auth/login', { email, password })
+    return this.$axios.$post('/auth/login', { email, password })
       .then((data) => {
         const token = data.token
         const payload = data.payload
         commit('SET_TOKEN', { token })
         commit('SET_USER_DATA', { data: payload })
         this.$router.push('/')
-      })
-      .catch((err) => {
-        console.log(err.message)
+        return data
       })
   },
   // Basically deletes token
@@ -76,22 +69,13 @@ export const actions = {
     if (getters.isAuthed) { return }
 
     return this.$axios.$post('/auth/forgot', { email })
-      .then((data) => {
-        return data.preview
-      })
-      .catch((err) => {
-        console.log(err.message)
-      })
   },
-  async reset ({ getters }, { token, password }) {
+  reset ({ getters }, { token, password }) {
     if (getters.isAuthed) { return }
 
-    await this.$axios.$post('/auth/reset', { token, password })
+    return this.$axios.$post('/auth/reset', { token, password })
       .then(() => {
         this.$router.push('/login')
-      })
-      .catch((err) => {
-        console.log(err.message)
       })
   }
 }

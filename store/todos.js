@@ -30,20 +30,18 @@ export const mutations = {
 
 export const actions = {
   // Fetch on page fetch
-  async fetchTodos ({ commit, getters }) {
+  fetchTodos ({ commit, getters }) {
     if (!getters.isAuthed) { return }
 
-    await this.$axios.$get('/todos/')
+    return this.$axios.$get('/todos/')
       .then((data) => {
         const todos = data.todos || []
         commit('SET_TODOS', { todos })
-      })
-      .catch((err) => {
-        console.log(err.message)
+        return data
       })
   },
   // Returns todo id after add
-  async addTodo ({ commit, state, getters }, { title, done }) {
+  addTodo ({ commit, state, getters }, { title, done }) {
     if (!getters.isAuthed) { return }
 
     // Cache temp id, when add temp todo, state's tempId will auto decrement
@@ -52,22 +50,22 @@ export const actions = {
 
     const index = getters.getTodoIndex(tempId)
 
-    await this.$axios.$post('/todos/add', { title, done })
+    return this.$axios.$post('/todos/add', { title, done })
       .then((data) => {
         const id = data.id
         commit('UPDATE_TODO', {
           index,
           todo: { id }
         })
-        return id
+        return data
       })
       .catch((err) => {
-        console.log(err.message)
         // Delete the temp todo
         commit('REMOVE_TODO', { index })
+        return Promise.reject(err)
       })
   },
-  async removeTodo ({ commit, state, getters }, { id }) {
+  removeTodo ({ commit, state, getters }, { id }) {
     if (!getters.isAuthed) { return }
 
     const index = getters.getTodoIndex(id)
@@ -76,14 +74,15 @@ export const actions = {
     const cacheTodo = state.todos[index]
 
     commit('REMOVE_TODO', { index })
-    await this.$axios.$delete('/todos/' + id)
+
+    return this.$axios.$delete('/todos/' + id)
       .catch((err) => {
-        console.log(err.message)
         // Add back todo
         commit('ADD_TODO', cacheTodo)
+        return Promise.reject(err)
       })
   },
-  async removeTodoDone ({ commit, state, getters }) {
+  removeTodoDone ({ commit, state, getters }) {
     if (!getters.isAuthed) { return }
     if (state.todos.findIndex(todo => todo.done) < 0) { return }
 
@@ -93,14 +92,14 @@ export const actions = {
       todos: state.todos.filter(t => !t.done)
     })
 
-    await this.$axios.$delete('/todos/done')
+    return this.$axios.$delete('/todos/done')
       .catch((err) => {
-        console.log(err.message)
         // Add back todos
         commit('SET_TODOS', { todos: cacheTodos })
+        return Promise.reject(err)
       })
   },
-  async setTodoTitle ({ commit, state, getters }, { id, title }) {
+  setTodoTitle ({ commit, state, getters }, { id, title }) {
     if (!getters.isAuthed) { return }
 
     const index = getters.getTodoIndex(id)
@@ -113,17 +112,17 @@ export const actions = {
       todo: { title }
     })
 
-    await this.$axios.$put('/todos/title/' + id, { title })
+    return this.$axios.$put('/todos/title/' + id, { title })
       .catch((err) => {
-        console.log(err)
         // Revert title
         commit('UPDATE_TODO', {
           index,
           todo: { title: cacheTitle }
         })
+        return Promise.reject(err)
       })
   },
-  async setTodoDone ({ commit, state, getters }, { id, done }) {
+  setTodoDone ({ commit, state, getters }, { id, done }) {
     if (!getters.isAuthed) { return }
 
     const index = getters.getTodoIndex(id)
@@ -136,14 +135,14 @@ export const actions = {
       todo: { done }
     })
 
-    await this.$axios.$put('/todos/done/' + id, { done: done.toString() })
+    return this.$axios.$put('/todos/done/' + id, { done: done.toString() })
       .catch((err) => {
-        console.log(err)
         // Revert done
         commit('UPDATE_TODO', {
           index,
           todo: { done: cacheDone.toString() }
         })
+        return Promise.reject(err)
       })
   }
 }
