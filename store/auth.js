@@ -7,10 +7,13 @@ export const state = () => ({
 
 export const mutations = {
   SET_TOKEN (state, { token }) {
+    token = token || ''
     state.token = token
     if (token) {
+      this.$axios.setToken(token)
       localStorage.setItem(JWT_TOKEN, token)
     } else {
+      this.$axios.setToken(false)
       localStorage.removeItem(JWT_TOKEN)
     }
   },
@@ -65,7 +68,7 @@ export const actions = {
   // Basically deletes token
   // ROADMAP: Switch to stateful auth implementation
   logout ({ commit }) {
-    commit('SET_TOKEN', { token: null })
+    commit('SET_TOKEN', { token: '' })
     commit('SET_USER_DATA', { data: null })
     this.$router.push('/login')
   },

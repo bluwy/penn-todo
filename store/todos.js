@@ -33,7 +33,7 @@ export const actions = {
   async fetchTodos ({ commit, getters }) {
     if (!getters.isAuthed) { return }
 
-    await this.$axios.$get('/todos/', { headers: { 'Authorization': getters.authHeader } })
+    await this.$axios.$get('/todos/')
       .then((data) => {
         const todos = data.todos || []
         commit('SET_TODOS', { todos })
@@ -52,7 +52,7 @@ export const actions = {
 
     const index = getters.getTodoIndex(tempId)
 
-    await this.$axios.$post('/todos/add', { title, done }, { headers: { 'Authorization': getters.authHeader } })
+    await this.$axios.$post('/todos/add', { title, done })
       .then((data) => {
         const id = data.id
         commit('UPDATE_TODO', {
@@ -76,7 +76,7 @@ export const actions = {
     const cacheTodo = state.todos[index]
 
     commit('REMOVE_TODO', { index })
-    await this.$axios.$delete('/todos/' + id, { headers: { 'Authorization': getters.authHeader } })
+    await this.$axios.$delete('/todos/' + id)
       .catch((err) => {
         console.log(err.message)
         // Add back todo
@@ -93,7 +93,7 @@ export const actions = {
       todos: state.todos.filter(t => !t.done)
     })
 
-    await this.$axios.$delete('/todos/done', { headers: { 'Authorization': getters.authHeader } })
+    await this.$axios.$delete('/todos/done')
       .catch((err) => {
         console.log(err.message)
         // Add back todos
@@ -113,7 +113,7 @@ export const actions = {
       todo: { title }
     })
 
-    await this.$axios.$put('/todos/title/' + id, { title }, { headers: { 'Authorization': getters.authHeader } })
+    await this.$axios.$put('/todos/title/' + id, { title })
       .catch((err) => {
         console.log(err)
         // Revert title
@@ -136,7 +136,7 @@ export const actions = {
       todo: { done }
     })
 
-    await this.$axios.$put('/todos/done/' + id, { done: done.toString() }, { headers: { 'Authorization': getters.authHeader } })
+    await this.$axios.$put('/todos/done/' + id, { done: done.toString() })
       .catch((err) => {
         console.log(err)
         // Revert done
@@ -151,9 +151,6 @@ export const actions = {
 export const getters = {
   isAuthed (state, getters, rootState, rootGetters) {
     return rootGetters['auth/isAuthed']
-  },
-  authHeader (state, getters, rootState) {
-    return rootState.auth.token
   },
   filterTodos: state => (filter) => {
     switch (filter) {
