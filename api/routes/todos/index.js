@@ -27,7 +27,7 @@ router.put('/title/:id', async (req, res) => {
   if (title) {
     await db.queryApi('UPDATE todos SET title=$1 WHERE id=$2 AND user_id=$3', [title, id, req.locals.userId], res)
   } else {
-    res.status(400).send(new Error('Data "title" is null or empty'))
+    res.status(400).send({ message: 'Data "title" is null or empty' })
   }
 })
 

@@ -31,6 +31,7 @@ export default {
   ** Plugins to load before mounting the App
   */
   plugins: [
+    { src: '~/plugins/axios.js', mode: 'client' },
     { src: '~/plugins/nuxt-client-init.js', mode: 'client' }
   ],
   /*

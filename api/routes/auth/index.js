@@ -28,11 +28,11 @@ router.post('/signup', async (req, res) => {
           await sendJwtToken(res, 'basic', result2.rows[0].id)
         }, { atLeastOneRow: true })
       } else {
-        res.status(401).send(new Error('Account already exist'))
+        res.status(401).send({ message: 'Account already exist' })
       }
     })
   } else {
-    res.status(400).send(new Error('Data "name", "email" or "password" is null or empty'))
+    res.status(400).send({ message: 'Data "name", "email" or "password" is null or empty' })
   }
 })
 
@@ -45,11 +45,11 @@ router.post('/login', async (req, res) => {
         // Send JWT
         await sendJwtToken(res, 'basic', result.rows[0].id)
       } else {
-        res.status(401).send(new Error('Invalid email or password'))
+        res.status(401).send({ message: 'Invalid email or password' })
       }
     })
   } else {
-    res.status(400).send(new Error('Data "email" or "password" is null or empty'))
+    res.status(400).send({ message: 'Data "email" or "password" is null or empty' })
   }
 })
 
@@ -62,7 +62,7 @@ router.post('/check', async (req, res) => {
       .catch(e => res.status(401).send(e))
       .finally(() => res.end())
   } else {
-    res.status(400).send(new Error('Data "token" is null or empty'))
+    res.status(400).send({ message: 'Data "token" is null or empty' })
   }
 })
 
@@ -96,11 +96,11 @@ router.post('/forgot', async (req, res) => {
 
         res.json({ preview: nm.getTestMessageUrl(info) })
       } else {
-        res.status(401).send(new Error('Email is not registered'))
+        res.status(401).send({ message: 'Email is not registered' })
       }
     })
   } else {
-    res.status(400).send(new Error('Data "email" is null or empty'))
+    res.status(400).send({ message: 'Data "email" is null or empty' })
   }
 })
 
@@ -117,7 +117,7 @@ router.post('/reset', async (req, res) => {
         res.status(401).send(e)
       })
   } else {
-    res.status(400).send(new Error('Data "token" or "password" is null or empty'))
+    res.status(400).send({ message: 'Data "token" or "password" is null or empty' })
   }
 })
 

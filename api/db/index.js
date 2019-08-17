@@ -34,7 +34,7 @@ export default {
 
           if (options) {
             if (options.atLeastOneRow && result.rowCount <= 0) {
-              res.status(204).send(new Error('Query result is empty'))
+              res.status(204).send({ message: 'Query result is empty' })
               stopCb = true
             }
           }

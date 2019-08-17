@@ -16,6 +16,6 @@ export default async (req, res, next) => {
       })
   } else {
     req.locals.authed = false
-    res.status(401).send(new Error('No token supplied'))
+    res.status(401).send({ message: 'No token supplied' })
   }
 }
