@@ -1,5 +1,6 @@
 <template>
   <div class="bg-image flex justify-center items-center h-screen">
+    <v-snackbar />
     <div class="card md:rounded-lg md:shadow-lg">
       <main class="flex-1 overflow-hidden">
         <nuxt class="h-full" />
@@ -9,8 +10,12 @@
 </template>
 
 <script>
-export default {
+import VSnackbar from '~/components/VSnackbar.vue'
 
+export default {
+  components: {
+    VSnackbar
+  }
 }
 </script>
 
@@ -46,7 +51,7 @@ a:hover, a:focus {
 }
 @media (min-width: 768px) {
   .card {
-    width: 500px;
+    @apply max-w-xl;
     min-height: 60%;
     max-height: 80%;
   }
@@ -61,7 +66,7 @@ a:hover, a:focus {
 }
 
 .error-box {
-  @apply p-3 my-3 text-white bg-red-500 rounded text-center;
+  @apply p-3 my-3 text-white bg-red-400 rounded text-center;
 }
 
 .btn {

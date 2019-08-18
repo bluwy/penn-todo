@@ -52,11 +52,12 @@ export default {
     ]),
     async submit () {
       if (this.$refs.form.checkValidity()) {
-        await this.forgot({
-          email: this.email
-        })
-          .then((preview) => {
-            this.errorMessage = 'Preview email at ' + preview
+        await this.forgot({ email: this.email })
+          .then((data) => {
+            this.errorMessage = 'Preview email at ' + data.preview
+          })
+          .catch((e) => {
+            this.errorMessage = e.message
           })
       }
     }

@@ -55,9 +55,7 @@
 </template>
 
 <script>
-import { createNamespacedHelpers } from 'vuex'
-
-const { mapActions } = createNamespacedHelpers('auth')
+import { mapActions } from 'vuex'
 
 export default {
   data () {
@@ -68,8 +66,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions([
+    ...mapActions('auth', [
       'login'
+    ]),
+    ...mapActions('snackbar', [
+      'sendSnack'
     ]),
     async submit () {
       if (this.$refs.form.checkValidity()) {
@@ -77,6 +78,15 @@ export default {
           email: this.email,
           password: this.password
         })
+          .then(() => {
+            this.sendSnack({
+              text: 'Log in successful',
+              type: 'success'
+            })
+          })
+          .catch((e) => {
+            this.errorMessage = e.message
+          })
       }
     }
   }

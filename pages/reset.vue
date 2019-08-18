@@ -61,6 +61,9 @@ export default {
           token: this.$route.query.token,
           password: this.password
         })
+          .catch((e) => {
+            this.errorMessage = e.message
+          })
       }
     }
   }
