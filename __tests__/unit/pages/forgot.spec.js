@@ -11,7 +11,7 @@ describe('Page Forgot', () => {
 
   beforeEach(() => {
     authActions = {
-      forgot: jest.fn()
+      forgot: jest.fn().mockResolvedValue()
     }
     store = new Vuex.Store({
       modules: {
@@ -28,19 +28,26 @@ describe('Page Forgot', () => {
     expect(wrapper.find('input#email')).toBeTruthy()
   })
 
-  it('should try submit even if fields are invalid', () => {
-    const methods = { submit: jest.fn() }
-    const wrapper = shallowMount(Forgot, { methods, store, localVue })
-    wrapper.find('form').trigger('submit')
-    expect(methods.submit).toBeCalled()
-  })
-
-  it('should submit to store if fields are valid', () => {
+  it('should submit to store if fields are valid', async () => {
+    expect.assertions(3)
     const wrapper = shallowMount(Forgot, { store, localVue })
-    wrapper.setData({
-      email: 'test@example.com'
-    })
+    wrapper.setData({ email: 'test@example.com' })
     wrapper.find('form').trigger('submit')
     expect(authActions.forgot).toBeCalled()
+
+    authActions.forgot.mockClear()
+    authActions.forgot.mockRejectedValue(new Error('Error'))
+    wrapper.find('form').trigger('submit')
+    await wrapper.vm.$nextTick()
+    expect(authActions.forgot).toBeCalled()
+    expect(wrapper.vm.errorMessage).toBe('Error')
+  })
+
+  it('should not submit to store if fields are invalid', async () => {
+    expect.assertions(1)
+    const wrapper = shallowMount(Forgot, { store, localVue })
+    wrapper.find('form').trigger('submit')
+    await wrapper.vm.$nextTick()
+    expect(authActions.forgot).not.toBeCalled()
   })
 })

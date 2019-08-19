@@ -7,17 +7,25 @@ localVue.use(Vuex)
 
 describe('Page Signup', () => {
   let authActions
+  let snackbarActions
   let store
 
   beforeEach(() => {
     authActions = {
-      signup: jest.fn()
+      signup: jest.fn().mockResolvedValue()
+    }
+    snackbarActions = {
+      sendSnack: jest.fn()
     }
     store = new Vuex.Store({
       modules: {
         auth: {
           namespaced: true,
           actions: authActions
+        },
+        snackbar: {
+          namespaced: true,
+          actions: snackbarActions
         }
       }
     })
@@ -44,14 +52,8 @@ describe('Page Signup', () => {
     expect(wrapper.find('input#name').attributes('maxlength')).toBe('16')
   })
 
-  it('should try submit even if fields are invalid', () => {
-    const methods = { submit: jest.fn() }
-    const wrapper = shallowMount(Signup, { methods, store, localVue })
-    wrapper.find('form').trigger('submit')
-    expect(methods.submit).toBeCalled()
-  })
-
-  it('should submit to store if fields are valid', () => {
+  it('should submit to store if fields are valid', async () => {
+    expect.assertions(3)
     const wrapper = shallowMount(Signup, { store, localVue })
     wrapper.setData({
       name: 'Bob',
@@ -59,6 +61,22 @@ describe('Page Signup', () => {
       password: 'correcthorsebatterystapler'
     })
     wrapper.find('form').trigger('submit')
+    await wrapper.vm.$nextTick()
     expect(authActions.signup).toBeCalled()
+
+    authActions.signup.mockClear()
+    authActions.signup.mockRejectedValue(new Error('Error'))
+    wrapper.find('form').trigger('submit')
+    await wrapper.vm.$nextTick()
+    expect(authActions.signup).toBeCalled()
+    expect(wrapper.vm.errorMessage).toBe('Error')
+  })
+
+  it('should not submit to store if fields are invalid', async () => {
+    expect.assertions(1)
+    const wrapper = shallowMount(Signup, { store, localVue })
+    wrapper.find('form').trigger('submit')
+    await wrapper.vm.$nextTick()
+    expect(authActions.signup).not.toBeCalled()
   })
 })

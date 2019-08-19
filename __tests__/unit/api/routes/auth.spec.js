@@ -1,10 +1,12 @@
 import request from 'supertest'
 import app from '~/api'
+import auth from '~/api/auth'
 import db from '~/api/db'
 
 jest.setTimeout(10000)
+jest.mock('~/api/auth')
 
-describe('API Auth', () => {
+describe('API Route Auth', () => {
   const userData = {
     name: 'Bob',
     email: 'test@example.com',
@@ -45,6 +47,7 @@ describe('API Auth', () => {
   describe('POST /signup', () => {
     it('should signup a user given correct credentials', async () => {
       expect.assertions(3)
+      auth.signJwt.mockResolvedValue('correctToken')
       const res = await request(app).post('/auth/signup').send(userData)
       expect(res.status).toBe(200)
       expect(res.body.payload).toHaveProperty('userId', 1)
@@ -68,6 +71,7 @@ describe('API Auth', () => {
   describe('POST /login', () => {
     it('should login a user given correct credentials', async () => {
       expect.assertions(3)
+      auth.signJwt.mockResolvedValue('correctToken')
       await addUser()
       const res = await request(app).post('/auth/login').send(userData)
       expect(res.status).toBe(200)
@@ -78,7 +82,7 @@ describe('API Auth', () => {
     it('should not login a user given wrong credentials', async () => {
       expect.assertions(1)
       await addUser()
-      const res = await request(app).post('/auth/login').send({ ...userData, password: '810' })
+      const res = await request(app).post('/auth/login').send({ ...userData, password: 'wrongPassword' })
       expect(res.status).toBe(401)
     })
 
@@ -91,25 +95,73 @@ describe('API Auth', () => {
 
   describe('POST /check', () => {
     it('should login and check a user given correct credentials', async () => {
-      expect.assertions(3)
-      await addUser()
-      const res = await request(app).post('/auth/login').send(userData)
-      expect(res.status).toBe(200)
-
-      const res2 = await request(app).post('/auth/check').send({ token: res.body.token })
+      expect.assertions(2)
+      auth.verifyJwt.mockResolvedValue({ userId: 1 })
+      const res2 = await request(app).post('/auth/check').send({ token: 'correctToken' })
       expect(res2.status).toBe(200)
       expect(res2.body).toHaveProperty('userId', 1)
     })
 
     it('should login and check error a user given wrong credentials', async () => {
       expect.assertions(1)
-      const res = await request(app).post('/auth/check').send({ token: '810' })
+      auth.verifyJwt.mockRejectedValue(new Error())
+      const res = await request(app).post('/auth/check').send({ token: 'wrongToken' })
       expect(res.status).toBe(401)
     })
 
     it('should respond status 400 when data insufficient', async () => {
       expect.assertions(1)
       const res = await request(app).post('/auth/check')
+      expect(res.status).toBe(400)
+    })
+  })
+
+  describe('POST /forgot', () => {
+    it('should return preview given correct credentials', async () => {
+      expect.assertions(2)
+      await addUser()
+      const res = await request(app).post('/auth/forgot').send(userData)
+      expect(res.status).toBe(200)
+      expect(res.body.preview).toBeTruthy()
+    })
+
+    it('should unauthorize given wrong credentials', async () => {
+      expect.assertions(1)
+      const res = await request(app).post('/auth/forgot').send({ email: 'wrongEmail' })
+      expect(res.status).toBe(401)
+    })
+
+    it('should respond status 400 when data insufficient', async () => {
+      expect.assertions(1)
+      const res = await request(app).post('/auth/forgot')
+      expect(res.status).toBe(400)
+    })
+  })
+
+  describe('POST /reset', () => {
+    it('should reset password given correct credentials', async () => {
+      expect.assertions(1)
+      auth.verifyJwt.mockResolvedValue({ email: 'correctEmail' })
+      const res = await request(app).post('/auth/reset').send({
+        token: 'correctToken',
+        password: '810'
+      })
+      expect(res.status).toBe(200)
+    })
+
+    it('should not reset password given wrong credentials', async () => {
+      expect.assertions(1)
+      auth.verifyJwt.mockRejectedValue(new Error())
+      const res = await request(app).post('/auth/reset').send({
+        token: 'wrongToken',
+        password: '810'
+      })
+      expect(res.status).toBe(401)
+    })
+
+    it('should respond status 400 when data insufficient', async () => {
+      expect.assertions(1)
+      const res = await request(app).post('/auth/reset')
       expect(res.status).toBe(400)
     })
   })

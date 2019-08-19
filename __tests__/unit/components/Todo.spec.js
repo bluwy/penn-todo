@@ -11,6 +11,7 @@ localVue.use(Vuex)
 
 describe('Component Todo', () => {
   let authActions
+  let snackbarActions
   let todosActions
   let todosGetters
   let store
@@ -19,11 +20,14 @@ describe('Component Todo', () => {
     authActions = {
       logout: jest.fn()
     }
+    snackbarActions = {
+      sendSnack: jest.fn()
+    }
     todosActions = {
-      addTodo: jest.fn(),
-      removeTodo: jest.fn(),
-      removeTodoDone: jest.fn(),
-      setTodoDone: jest.fn()
+      addTodo: jest.fn().mockResolvedValue(),
+      removeTodo: jest.fn().mockResolvedValue(),
+      removeTodoDone: jest.fn().mockResolvedValue(),
+      setTodoDone: jest.fn().mockResolvedValue()
     }
     todosGetters = {
       filterTodos: jest.fn(() => () => [])
@@ -34,6 +38,10 @@ describe('Component Todo', () => {
           namespaced: true,
           actions: authActions
         },
+        snackbar: {
+          namespaced: true,
+          actions: snackbarActions
+        },
         todos: {
           namespaced: true,
           actions: todosActions,
@@ -43,33 +51,71 @@ describe('Component Todo', () => {
     })
   })
 
-  it('should logout when todo close', () => {
+  it('should logout when todo close', async () => {
+    expect.assertions(1)
     const wrapper = shallowMount(Todo, { store, localVue })
     wrapper.find(TodoHeader).vm.$emit('close')
+    await wrapper.vm.$nextTick()
     expect(authActions.logout).toBeCalled()
   })
 
-  it('should add todo when event add-todo', () => {
+  it('should add todo when event add-todo', async () => {
+    expect.assertions(3)
     const wrapper = shallowMount(Todo, { store, localVue })
-    wrapper.find(TodoInput).vm.$emit('add-todo')
+    wrapper.find(TodoInput).vm.$emit('add-todo', {})
+    await wrapper.vm.$nextTick()
     expect(todosActions.addTodo).toBeCalled()
+
+    todosActions.addTodo.mockClear()
+    todosActions.addTodo.mockRejectedValue(new Error())
+    wrapper.find(TodoInput).vm.$emit('add-todo', {})
+    await wrapper.vm.$nextTick()
+    expect(todosActions.addTodo).toBeCalled()
+    expect(snackbarActions.sendSnack).toBeCalled()
   })
 
-  it('should remove done todo when event remove-todo-done', () => {
+  it('should remove done todo when event remove-todo-done', async () => {
+    expect.assertions(3)
     const wrapper = shallowMount(Todo, { store, localVue })
     wrapper.find(TodoToolbar).vm.$emit('remove-todo-done')
+    await wrapper.vm.$nextTick()
     expect(todosActions.removeTodoDone).toBeCalled()
+
+    todosActions.removeTodoDone.mockClear()
+    todosActions.removeTodoDone.mockRejectedValue(new Error())
+    wrapper.find(TodoToolbar).vm.$emit('remove-todo-done')
+    await wrapper.vm.$nextTick()
+    expect(todosActions.removeTodoDone).toBeCalled()
+    expect(snackbarActions.sendSnack).toBeCalled()
   })
 
-  it('should set todo done when event set-todo-done', () => {
+  it('should set todo done when event set-todo-done', async () => {
+    expect.assertions(3)
     const wrapper = shallowMount(Todo, { store, localVue })
-    wrapper.find(TodoList).vm.$emit('set-todo-done')
+    wrapper.find(TodoList).vm.$emit('set-todo-done', {})
+    await wrapper.vm.$nextTick()
     expect(todosActions.setTodoDone).toBeCalled()
+
+    todosActions.setTodoDone.mockClear()
+    todosActions.setTodoDone.mockRejectedValue(new Error())
+    wrapper.find(TodoList).vm.$emit('set-todo-done', {})
+    await wrapper.vm.$nextTick()
+    expect(todosActions.setTodoDone).toBeCalled()
+    expect(snackbarActions.sendSnack).toBeCalled()
   })
 
-  it('should remove todo when event remove-todo', () => {
+  it('should remove todo when event remove-todo', async () => {
+    expect.assertions(3)
     const wrapper = shallowMount(Todo, { store, localVue })
-    wrapper.find(TodoList).vm.$emit('remove-todo')
+    wrapper.find(TodoList).vm.$emit('remove-todo', {})
+    await wrapper.vm.$nextTick()
     expect(todosActions.removeTodo).toBeCalled()
+
+    todosActions.removeTodo.mockClear()
+    todosActions.removeTodo.mockRejectedValue(new Error())
+    wrapper.find(TodoList).vm.$emit('remove-todo', {})
+    await wrapper.vm.$nextTick()
+    expect(todosActions.removeTodo).toBeCalled()
+    expect(snackbarActions.sendSnack).toBeCalled()
   })
 })
