@@ -7,4 +7,14 @@ describe('Page Home', () => {
     const wrapper = shallowMount(Home)
     expect(wrapper.find(Todo).exists()).toBeTruthy()
   })
+
+  it('s fetch should dispatch store to fetch todos', async () => {
+    expect.assertions(1)
+    const wrapper = shallowMount(Home)
+    const ctx = {
+      store: { dispatch: jest.fn().mockResolvedValue() }
+    }
+    await wrapper.vm.$options.fetch(ctx)
+    expect(ctx.store.dispatch).toBeCalled()
+  })
 })

@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
-import Reset from '~/pages/Reset.vue'
+import Reset from '~/pages/reset.vue'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
@@ -29,6 +29,26 @@ describe('Page Reset', () => {
         }
       }
     }
+  })
+
+  it('s middleware should stay on page if query has token', () => {
+    const wrapper = shallowMount(Reset, { mocks, store, localVue })
+    const ctx = {
+      query: { token: '810' },
+      redirect: jest.fn()
+    }
+    wrapper.vm.$options.middleware(ctx)
+    expect(ctx.redirect).not.toBeCalled()
+  })
+
+  it('s middleware should redirect if query has no token', () => {
+    const wrapper = shallowMount(Reset, { mocks, store, localVue })
+    const ctx = {
+      query: {},
+      redirect: jest.fn()
+    }
+    wrapper.vm.$options.middleware(ctx)
+    expect(ctx.redirect).toBeCalled()
   })
 
   it('should have a password input', () => {
