@@ -18,6 +18,7 @@
 
 <script>
 import { createNamespacedHelpers } from 'vuex'
+import { wait } from '~/assets/js/utils.js'
 
 const { mapState } = createNamespacedHelpers('snackbar')
 
@@ -52,28 +53,13 @@ export default {
     snack (val) {
       this.snacks.push(val)
       this.promise = this.promise
-        .then(() => {
-          return new Promise((resolve) => {
-            this.currentSnack = this.snacks.shift()
-            this.show = true
-
-            // Ugly code below:
-            // 2. Unshow the snack and resolve
-            const unshow = () => {
-              this.show = false
-              this.next = null
-              setTimeout(() => resolve(), this.animTime)
-            }
-
-            // 1. Wait for showTime before unshow
-            const timeout = setTimeout(() => unshow(), this.showTime)
-
-            // 3. Set the next so we can call it to skip showTime and unshow immediately
-            this.next = () => {
-              clearTimeout(timeout)
-              unshow()
-            }
-          })
+        .then(async () => {
+          this.currentSnack = this.snacks.shift()
+          this.show = true
+          await wait(this.animTime + this.showTime, (end) => { this.next = end })
+          this.next = null
+          this.show = false
+          await wait(this.animTime)
         })
     }
   },
