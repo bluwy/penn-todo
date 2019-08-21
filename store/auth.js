@@ -77,6 +77,16 @@ export const actions = {
       .then(() => {
         this.$router.push('/login')
       })
+  },
+  sendVerify ({ getters }, { email }) {
+    if (getters.isAuthed) { return }
+
+    return this.$axios.$post('/auth/send-verify', { email })
+  },
+  verify ({ getters }, { token }) {
+    if (getters.isAuthed) { return }
+
+    return this.$axios.$post('/auth/verify', { token })
   }
 }
 

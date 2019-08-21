@@ -6,7 +6,18 @@
           Log In
         </h1>
       </div>
-      <span v-show="errorMessage" class="error-box">{{ errorMessage }}</span>
+      <div v-show="errorMessage" class="error-box">
+        <span>{{ errorMessage }}</span>
+        <template v-if="unverified">
+          <br>
+          <span>
+            Didn't receive verification email?
+            <button class="btn btn-outline btn-outline-white" :class="{ 'btn-disabled': emailSent }" @click="sendVerificationEmail">
+              {{ emailSent ? 'Email sent' : 'Send again' }}
+            </button>
+          </span>
+        </template>
+      </div>
       <form ref="form" @submit.prevent="submit">
         <div>
           <label for="email">Email</label>
@@ -62,12 +73,15 @@ export default {
     return {
       email: '',
       password: '',
-      errorMessage: ''
+      errorMessage: '',
+      unverified: false,
+      emailSent: false
     }
   },
   methods: {
     ...mapActions('auth', [
-      'login'
+      'login',
+      'sendVerify'
     ]),
     ...mapActions('snackbar', [
       'sendSnack'
@@ -86,6 +100,20 @@ export default {
           })
           .catch((e) => {
             this.errorMessage = e.message
+            this.unverified = (e.name === 'auth-unverified')
+          })
+      }
+    },
+    async sendVerificationEmail () {
+      if (this.$refs.form.checkValidity()) {
+        this.emailSent = true
+        await this.sendVerify({ email: this.email })
+          .then((data) => {
+            this.errorMessage = 'Preview email at ' + data.preview
+          })
+          .catch((e) => {
+            this.errorMessage = e.message
+            this.emailSent = false
           })
       }
     }

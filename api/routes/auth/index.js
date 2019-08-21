@@ -1,9 +1,9 @@
 import { Router } from 'express'
 import nm from 'nodemailer'
-import db from '../../db'
 import auth from '../../auth'
+import db from '../../db'
+import mail from '../../mail'
 
-/** @type{Router} */
 const router = new Router()
 
 // Manage send token and end response
@@ -40,10 +40,14 @@ router.post('/login', async (req, res) => {
   const { email = null, password = null } = req.body
 
   if (email && password) {
-    await db.queryApi('SELECT id, hash=crypt($1, hash) AS match FROM users WHERE email=$2', [password, email], res, async (result) => {
+    await db.queryApi('SELECT id, hash=crypt($1, hash) AS match, verified FROM users WHERE email=$2', [password, email], res, async (result) => {
       if (result.rowCount > 0 && result.rows[0].match) {
-        // Send JWT
-        await sendJwtToken(res, 'basic', result.rows[0].id)
+        if (!result.rows[0].verified) {
+          res.status(401).send({ name: 'auth-unverified', message: 'Account is not verified' })
+        } else {
+          // Send JWT
+          await sendJwtToken(res, 'basic', result.rows[0].id)
+        }
       } else {
         res.status(401).send({ message: 'Invalid email or password' })
       }
@@ -74,27 +78,18 @@ router.post('/forgot', async (req, res) => {
       if (result.rowCount > 0) {
         const token = await auth.signJwt({ email }, { expiresIn: '1h' })
 
-        // Send email
-        const acc = await nm.createTestAccount()
-
-        const transporter = nm.createTransport({
-          host: 'smtp.ethereal.email',
-          port: 587,
-          secure: false,
-          auth: {
-            user: acc.user,
-            pass: acc.pass
-          }
-        })
-
-        const info = await transporter.sendMail({
+        await mail.sendMail({
           from: 'no-reply@example.com',
           to: email,
           subject: 'Penn Todo: Reset password',
           html: `<p>Hello ${result.rows[0].name},</p><p>Click <a href="https://${req.headers.host}/reset?token=${token}">this link</a> to reset password.</p><p>If you did not request a password reset, please ignore this email.</p><p>Regards, Penn Todo team.`
         })
-
-        res.json({ preview: nm.getTestMessageUrl(info) })
+          .then((info) => {
+            res.json({ preview: nm.getTestMessageUrl(info) })
+          })
+          .catch((e) => {
+            res.status(500).send(e)
+          })
       } else {
         res.status(401).send({ message: 'Email is not registered' })
       }
@@ -118,6 +113,53 @@ router.post('/reset', async (req, res) => {
       })
   } else {
     res.status(400).send({ message: 'Data "token" or "password" is null or empty' })
+  }
+})
+
+router.post('/send-verify', async (req, res) => {
+  const { email } = req.body
+
+  if (email) {
+    await db.queryApi('SELECT name, verified FROM users WHERE email=$1', [email], res, async (result) => {
+      if (result.rowCount > 0) {
+        if (!result.rows[0].verified) {
+          const token = await auth.signJwt({ email }, { expiresIn: '1h' })
+
+          await mail.sendMail({
+            from: 'no-reply@example.com',
+            to: email,
+            subject: 'Penn Todo: Verify email',
+            html: `<p>Hello ${result.rows[0].name},</p><p>Click <a href="https://${req.headers.host}/verify?token=${token}">this link</a> to verify your account.</p><p>Regards, Penn Todo team.`
+          })
+            .then((info) => {
+              res.json({ preview: nm.getTestMessageUrl(info) })
+            })
+            .catch((e) => {
+              res.status(500).send(e)
+            })
+        } else {
+          res.status(422).send({ message: 'Account already verified' })
+        }
+      } else {
+        res.status(401).send({ message: 'Email is not registered' })
+      }
+    })
+  }
+})
+
+router.post('/verify', async (req, res) => {
+  const { token } = req.body
+
+  if (token) {
+    await auth.verifyJwt(token)
+      .then(async (dec) => {
+        await db.queryApi('UPDATE users SET verified=$1 WHERE email=$2', [true, dec.email], res)
+      })
+      .catch((e) => {
+        res.status(401).send(e)
+      })
+  } else {
+    res.status(400).send({ message: 'Data "token" is null or empty' })
   }
 })
 

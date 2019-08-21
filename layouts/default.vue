@@ -81,6 +81,13 @@ a:hover, a:focus {
   @apply bg-purple-500 text-white;
 }
 
+.btn-outline-white {
+  @apply border-white text-white;
+}
+.btn-outline-white:hover {
+  @apply bg-white text-black;
+}
+
 .btn-icon {
   @apply px-2;
 }
@@ -90,6 +97,10 @@ a:hover, a:focus {
 }
 .btn-text:hover {
   @apply bg-purple-500 text-white;
+}
+
+.btn-disabled, .btn-disabled:hover {
+  @apply bg-gray-500 border-gray-500 text-black pointer-events-none;
 }
 
 .flex-sm {
