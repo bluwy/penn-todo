@@ -1,9 +1,9 @@
 <template>
-  <div class="flex justify-between">
-    <div class="flex-1 flex items-center">
+  <div class="flex flex-wrap">
+    <div class="w-6/12 sm:flex-1 flex items-center">
       <span>{{ info }}</span>
     </div>
-    <div class="flex">
+    <div class="order-last w-full sm:order-none sm:w-auto flex justify-center">
       <span>
         <input
           id="all"
@@ -43,7 +43,7 @@
         <label class="radio-label" for="done">Done</label>
       </span>
     </div>
-    <div class="flex-1 text-right">
+    <div class="w-6/12 sm:flex-1 text-right">
       <button class="btn btn-text" @click="$emit('remove-todo-done')">
         <i class="icon-cancel" />
         Clear done

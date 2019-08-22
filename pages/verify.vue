@@ -36,8 +36,8 @@ export default {
       errorMessage: ''
     }
   },
-  mounted () {
-    this.verify({ token: this.$route.query.token })
+  async mounted () {
+    await this.verify({ token: this.$route.query.token })
       .then(() => {
         this.status = 'Account verified!'
         this.success = true
