@@ -12,7 +12,8 @@ describe('Page Login', () => {
 
   beforeEach(() => {
     authActions = {
-      login: jest.fn().mockResolvedValue()
+      login: jest.fn().mockResolvedValue(),
+      sendVerify: jest.fn().mockResolvedValue()
     }
     snackbarActions = {
       sendSnack: jest.fn()
@@ -66,5 +67,25 @@ describe('Page Login', () => {
     wrapper.find('form').trigger('submit')
     await wrapper.vm.$nextTick()
     expect(authActions.login).not.toBeCalled()
+  })
+
+  it('should send verification email if fields are valid but not verified on button clicked', async () => {
+    expect.assertions(3)
+    const wrapper = shallowMount(Login, { store, localVue })
+    wrapper.setData({
+      email: 'test@example.com',
+      password: 'correcthorsebatterystapler',
+      unverified: true
+    })
+    wrapper.find('button').trigger('click')
+    await wrapper.vm.$nextTick()
+    expect(authActions.sendVerify).toBeCalled()
+
+    authActions.sendVerify.mockClear()
+    authActions.sendVerify.mockRejectedValue(new Error('Error'))
+    wrapper.find('button').trigger('click')
+    await wrapper.vm.$nextTick()
+    expect(authActions.sendVerify).toBeCalled()
+    expect(wrapper.vm.errorMessage).toBe('Error')
   })
 })
