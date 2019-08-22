@@ -20,5 +20,12 @@ export default {
    */
   sendMail (options) {
     return transporter.sendMail(options)
+  },
+  /**
+   * Get test message URL for Ethereal test accounts
+   * @param {nm.SentMessageInfo} info Mail info
+   */
+  getTestMessageUrl (info) {
+    return nm.getTestMessageUrl(info)
   }
 }

@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import nm from 'nodemailer'
 import auth from '../../auth'
 import db from '../../db'
 import mail from '../../mail'
@@ -85,11 +84,13 @@ router.post('/forgot', async (req, res) => {
           html: `<p>Hello ${result.rows[0].name},</p><p>Click <a href="https://${req.headers.host}/reset?token=${token}">this link</a> to reset password.</p><p>If you did not request a password reset, please ignore this email.</p><p>Regards, Penn Todo team.`
         })
           .then((info) => {
-            res.json({ preview: nm.getTestMessageUrl(info) })
+            res.json({ preview: mail.getTestMessageUrl(info) })
           })
           .catch((e) => {
             res.status(500).send(e)
           })
+
+        res.end()
       } else {
         res.status(401).send({ message: 'Email is not registered' })
       }
@@ -111,6 +112,8 @@ router.post('/reset', async (req, res) => {
       .catch((e) => {
         res.status(401).send(e)
       })
+
+    res.end()
   } else {
     res.status(400).send({ message: 'Data "token" or "password" is null or empty' })
   }
@@ -132,11 +135,13 @@ router.post('/send-verify', async (req, res) => {
             html: `<p>Hello ${result.rows[0].name},</p><p>Click <a href="https://${req.headers.host}/verify?token=${token}">this link</a> to verify your account.</p><p>Regards, Penn Todo team.`
           })
             .then((info) => {
-              res.json({ preview: nm.getTestMessageUrl(info) })
+              res.json({ preview: mail.getTestMessageUrl(info) })
             })
             .catch((e) => {
               res.status(500).send(e)
             })
+
+          res.end()
         } else {
           res.status(422).send({ message: 'Account already verified' })
         }
@@ -144,6 +149,8 @@ router.post('/send-verify', async (req, res) => {
         res.status(401).send({ message: 'Email is not registered' })
       }
     })
+  } else {
+    res.status(400).send({ message: 'Data "email" is null or empty' })
   }
 })
 
@@ -158,6 +165,8 @@ router.post('/verify', async (req, res) => {
       .catch((e) => {
         res.status(401).send(e)
       })
+
+    res.end()
   } else {
     res.status(400).send({ message: 'Data "token" is null or empty' })
   }

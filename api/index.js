@@ -1,3 +1,4 @@
+import './load-env.js'
 import express from 'express'
 import bodyParser from 'body-parser'
 import reqLocals from './middleware/req-locals.js'

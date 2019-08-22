@@ -1,9 +1,5 @@
 import { Pool } from 'pg'
 
-// Config here else can't get environment variables
-// This file runs before anything else idk why, so I config here
-require('dotenv').config()
-
 // Connection string from environment variables
 const connectionString = process.env.NODE_ENV === 'test' ? process.env.DATABASE_URL_TEST : process.env.DATABASE_URL
 
