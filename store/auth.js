@@ -28,7 +28,12 @@ export const actions = {
     if (token) {
       await this.$axios.$post('/auth/check', { token })
         .then((data) => {
+          commit('SET_TOKEN', { token })
           commit('SET_USER_DATA', { data })
+        })
+        .catch(() => {
+          commit('SET_TOKEN', { token: '' })
+          commit('SET_USER_DATA', { data: null })
         })
     }
   },

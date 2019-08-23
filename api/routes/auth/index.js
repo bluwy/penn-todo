@@ -61,7 +61,17 @@ router.post('/check', async (req, res) => {
 
   if (token) {
     await auth.verifyJwt(token)
-      .then(dec => res.json(dec))
+      .then(async (dec) => {
+        await db.queryApi('SELECT pwd_reset_ts FROM users WHERE id=$1', [dec.userId], res, (result) => {
+          const resetTimestamp = result.rows[0].pwd_reset_ts
+          const iat = new Date(dec.iat * 1000)
+          if (iat > resetTimestamp) {
+            res.json(dec)
+          } else {
+            res.status(401).send({ message: 'Token expired' })
+          }
+        }, { atLeastOneRow: true })
+      })
       .catch(e => res.status(401).send(e))
       .finally(() => res.end())
   } else {
@@ -107,7 +117,7 @@ router.post('/reset', async (req, res) => {
     await auth.verifyJwt(token)
       .then(async (dec) => {
         const salt = 'bf'
-        await db.queryApi('UPDATE users SET hash=crypt($1, gen_salt($2)) WHERE email=$3', [password, salt, dec.email], res)
+        await db.queryApi('UPDATE users SET hash=crypt($1, gen_salt($2)), pwd_reset_ts=now() WHERE email=$3', [password, salt, dec.email], res)
       })
       .catch((e) => {
         res.status(401).send(e)
