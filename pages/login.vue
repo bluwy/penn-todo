@@ -12,8 +12,14 @@
           <br>
           <span>
             Didn't receive verification email?
-            <button class="btn btn-outline btn-outline-white" :class="{ 'btn-disabled': emailSent }" @click="sendVerificationEmail">
-              {{ emailSent ? 'Email sent' : 'Send again' }}
+            <span v-show="loadingShow" class="loading-ring" />
+            <button
+              class="btn btn-outline btn-outline-white"
+              :class="{ 'btn-disabled': emailSent }"
+              :disabled="emailSent"
+              @click="sendVerificationEmail"
+            >
+              Send again
             </button>
           </span>
         </template>
@@ -75,7 +81,8 @@ export default {
       password: '',
       errorMessage: '',
       unverified: false,
-      emailSent: false
+      emailSent: false,
+      loadingShow: false
     }
   },
   methods: {
@@ -105,15 +112,23 @@ export default {
       }
     },
     async sendVerificationEmail () {
-      if (this.$refs.form.checkValidity()) {
+      if (!this.emailSent && this.$refs.form.checkValidity()) {
         this.emailSent = true
+        this.loadingShow = true
         await this.sendVerify({ email: this.email })
           .then((data) => {
             this.errorMessage = 'Preview email at ' + data.preview
+            this.sendSnack({
+              text: 'Email sent',
+              type: 'success'
+            })
           })
           .catch((e) => {
-            this.errorMessage = e.message
             this.emailSent = false
+            this.errorMessage = e.message
+          })
+          .finally(() => {
+            this.loadingShow = false
           })
       }
     }

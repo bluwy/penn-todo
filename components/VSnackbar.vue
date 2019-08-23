@@ -80,7 +80,7 @@ export default {
   left: 50%;
   opacity: 0;
   transform: translateX(-50%) translateY(0);
-  transition: transform .2s cubic-bezier(0.39, 0.575, 0.565, 1), opacity .2s cubic-bezier(0.39, 0.575, 0.565, 1);
+  transition: transform .2s cubic-bezier(.4, 0, .2, 1), opacity .2s cubic-bezier(.4, 0, .2, 1);
 }
 .wrapper.show {
   opacity: 1;

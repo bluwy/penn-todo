@@ -90,7 +90,7 @@ export default {
         })
           .then(() => {
             this.sendSnack({
-              text: 'Log in successful',
+              text: 'Sign up successful',
               type: 'success'
             })
           })

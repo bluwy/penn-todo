@@ -103,6 +103,35 @@ a:hover, a:focus {
   @apply bg-gray-500 border-gray-500 text-black pointer-events-none;
 }
 
+.loading-ring {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.loading-ring::after {
+  @apply border-purple-500;
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-width: 3px;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .flex-sm {
   @apply -mx-1;
 }

@@ -21,7 +21,13 @@
           >
         </div>
         <div class="text-right">
-          <button class="btn btn-outline" type="submit">
+          <span v-show="loadingShow" class="loading-ring" />
+          <button
+            class="btn btn-outline"
+            :class="{ 'btn-disabled': emailSent }"
+            type="submit"
+            :disabled="emailSent"
+          >
             Send
           </button>
         </div>
@@ -35,29 +41,42 @@
 </template>
 
 <script>
-import { createNamespacedHelpers } from 'vuex'
-
-const { mapActions } = createNamespacedHelpers('auth')
+import { mapActions } from 'vuex'
 
 export default {
   data () {
     return {
       email: '',
-      errorMessage: ''
+      errorMessage: '',
+      emailSent: false,
+      loadingShow: false
     }
   },
   methods: {
-    ...mapActions([
+    ...mapActions('auth', [
       'forgot'
     ]),
+    ...mapActions('snackbar', [
+      'sendSnack'
+    ]),
     async submit () {
-      if (this.$refs.form.checkValidity()) {
+      if (!this.emailSent && this.$refs.form.checkValidity()) {
+        this.emailSent = true
+        this.loadingShow = true
         await this.forgot({ email: this.email })
           .then((data) => {
             this.errorMessage = 'Preview email at ' + data.preview
+            this.sendSnack({
+              text: 'Email sent',
+              type: 'success'
+            })
           })
           .catch((e) => {
+            this.emailSent = false
             this.errorMessage = e.message
+          })
+          .finally(() => {
+            this.loadingShow = false
           })
       }
     }

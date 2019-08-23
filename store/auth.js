@@ -88,9 +88,6 @@ export const actions = {
     if (getters.isAuthed) { return }
 
     return this.$axios.$post('/auth/reset', { token, password })
-      .then(() => {
-        this.$router.push('/login')
-      })
   },
   sendVerify ({ getters }, { email }) {
     if (getters.isAuthed) { return }

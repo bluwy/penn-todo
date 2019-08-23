@@ -35,9 +35,7 @@
 </template>
 
 <script>
-import { createNamespacedHelpers } from 'vuex'
-
-const { mapActions } = createNamespacedHelpers('auth')
+import { mapActions } from 'vuex'
 
 export default {
   middleware ({ query, redirect }) {
@@ -52,8 +50,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions([
+    ...mapActions('auth', [
       'reset'
+    ]),
+    ...mapActions('snackbar', [
+      'sendSnack'
     ]),
     async submit () {
       if (this.$refs.form.checkValidity()) {
@@ -61,6 +62,13 @@ export default {
           token: this.$route.query.token,
           password: this.password
         })
+          .then(() => {
+            this.sendSnack({
+              text: 'Password resetted',
+              type: 'success'
+            })
+            this.$router.push('/login')
+          })
           .catch((e) => {
             this.errorMessage = e.message
           })
