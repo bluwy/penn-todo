@@ -1,7 +1,7 @@
 const JWT_TOKEN = 'jwtToken'
 
 export const state = () => ({
-  token: localStorage.getItem(JWT_TOKEN) || '',
+  token: '',
   userData: null
 })
 
@@ -23,18 +23,27 @@ export const mutations = {
 }
 
 export const actions = {
-  async nuxtClientInit ({ state, commit }) {
-    const token = state.token
+  async nuxtClientInit ({ dispatch }) {
+    await dispatch('check').catch(() => {})
+  },
+  check ({ commit }) {
+    const token = localStorage.getItem(JWT_TOKEN) || ''
     if (token) {
-      await this.$axios.$post('/auth/check', { token })
+      return this.$axios.$post('/auth/check', { token })
         .then((data) => {
           commit('SET_TOKEN', { token })
           commit('SET_USER_DATA', { data })
+          return data
         })
-        .catch(() => {
+        .catch((e) => {
           commit('SET_TOKEN', { token: '' })
           commit('SET_USER_DATA', { data: null })
+          return Promise.reject(e)
         })
+    } else {
+      commit('SET_TOKEN', { token: '' })
+      commit('SET_USER_DATA', { data: null })
+      return Promise.reject(new Error('No token'))
     }
   },
   signup ({ commit, getters }, { name, email, password }) {
