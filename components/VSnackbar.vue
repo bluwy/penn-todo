@@ -39,13 +39,17 @@ export default {
       'snack'
     ]),
     snackColor () {
-      const type = this.currentSnack.type
-      return {
-        'bg-gray-400': type === 'default',
-        'bg-blue-400 text-white': type === 'info',
-        'bg-green-400 text-white': type === 'success',
-        'bg-yellow-400 text-white': type === 'warning',
-        'bg-red-400 text-white': type === 'error'
+      switch (this.type) {
+        case 'info':
+          return 'bg-blue-300 text-white'
+        case 'success':
+          return 'bg-green-400 text-white'
+        case 'warning':
+          return 'bg-yellow-300'
+        case 'error':
+          return 'bg-red-400 text-white'
+        default:
+          return 'bg-gray-400'
       }
     }
   },
