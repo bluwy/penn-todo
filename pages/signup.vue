@@ -6,7 +6,7 @@
           Sign Up
         </h1>
       </div>
-      <span v-show="errorMessage" class="error-box">{{ errorMessage }}</span>
+      <v-infobox class="my-3" :text="infoText" :type="infoType" auto-empty-hide />
       <form ref="form" @submit.prevent="submit">
         <div>
           <label for="name">Name</label>
@@ -49,8 +49,9 @@
           >
         </div>
         <div class="text-right">
+          <span v-show="signupLoading" class="loading-ring" />
           <button class="btn btn-outline" type="submit">
-            Go
+            Sign up
           </button>
         </div>
       </form>
@@ -64,38 +65,62 @@
 
 <script>
 import { mapActions } from 'vuex'
+import VInfobox from '~/components/VInfobox.vue'
 
 export default {
+  components: {
+    VInfobox
+  },
   data () {
     return {
       name: '',
       email: '',
       password: '',
-      errorMessage: ''
+      infoText: '',
+      infoType: '',
+      signupLoading: false,
+      signupDone: false
     }
   },
   methods: {
     ...mapActions('auth', [
-      'signup'
+      'signup',
+      'sendVerify'
     ]),
     ...mapActions('snackbar', [
       'sendSnack'
     ]),
     async submit () {
-      if (this.$refs.form.checkValidity()) {
+      if (!this.signupDone && this.$refs.form.checkValidity()) {
+        this.signupDone = true
+        this.signupLoading = true
         await this.signup({
           name: this.name,
           email: this.email,
           password: this.password
         })
-          .then(() => {
+          .then(async () => {
             this.sendSnack({
               text: 'Sign up successful',
               type: 'success'
             })
+            const { preview } = await this.sendVerify({ email: this.email })
+            this.$router.push({
+              name: 'login',
+              params: {
+                email: this.email,
+                password: this.password,
+                extraInfo: 'Verification email has been sent. Please verify before logging in. Preview at ' + preview
+              }
+            })
           })
           .catch((e) => {
-            this.errorMessage = e.message
+            this.signupDone = false
+            this.infoText = e.message
+            this.infoType = 'error'
+          })
+          .finally(() => {
+            this.signupLoading = false
           })
       }
     }

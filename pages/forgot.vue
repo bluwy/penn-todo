@@ -5,7 +5,7 @@
         Forgot Password
       </h1>
       <span class="my-3 text-center">Enter your email below to send a "reset password" email</span>
-      <span v-show="errorMessage" class="error-box">{{ errorMessage }}</span>
+      <v-infobox class="my-3" :text="infoText" :type="infoType" auto-empty-hide />
       <form ref="form" @submit.prevent="submit">
         <div>
           <label for="email">Email</label>
@@ -42,12 +42,17 @@
 
 <script>
 import { mapActions } from 'vuex'
+import VInfobox from '~/components/VInfobox.vue'
 
 export default {
+  components: {
+    VInfobox
+  },
   data () {
     return {
       email: '',
-      errorMessage: '',
+      infoText: '',
+      infoType: '',
       emailSent: false,
       loadingShow: false
     }
@@ -65,7 +70,8 @@ export default {
         this.loadingShow = true
         await this.forgot({ email: this.email })
           .then((data) => {
-            this.errorMessage = 'Preview email at ' + data.preview
+            this.infoText = 'Preview email at ' + data.preview
+            this.infoType = 'info'
             this.sendSnack({
               text: 'Email sent',
               type: 'success'
@@ -73,7 +79,8 @@ export default {
           })
           .catch((e) => {
             this.emailSent = false
-            this.errorMessage = e.message
+            this.infoText = e.message
+            this.infoType = 'error'
           })
           .finally(() => {
             this.loadingShow = false

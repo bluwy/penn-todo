@@ -65,10 +65,6 @@ a:hover, a:focus {
   @apply outline-none shadow-none border-purple-500;
 }
 
-.error-box {
-  @apply p-3 my-3 text-white bg-red-400 rounded text-center;
-}
-
 .btn {
   @apply px-3 py-1 rounded font-semibold;
   transition: all .2s cubic-bezier(.4, 0, .2, 1);

@@ -6,24 +6,26 @@
           Log In
         </h1>
       </div>
-      <div v-show="errorMessage" class="error-box">
-        <span>{{ errorMessage }}</span>
-        <template v-if="unverified">
-          <br>
-          <span>
-            Didn't receive verification email?
-            <span v-show="loadingShow" class="loading-ring" />
-            <button
-              class="btn btn-outline btn-outline-white"
-              :class="{ 'btn-disabled': emailSent }"
-              :disabled="emailSent"
-              @click="sendVerificationEmail"
-            >
-              Send again
-            </button>
-          </span>
-        </template>
-      </div>
+      <span v-if="extraInfo" class="my-3 text-center">{{ extraInfo }}</span>
+      <v-infobox
+        class="my-3"
+        :text="infoText"
+        :type="infoType"
+        auto-empty-hide
+      >
+        <div v-show="unverified">
+          Didn't receive verification email?
+          <span v-show="loadingShow" class="loading-ring" />
+          <button
+            class="btn btn-outline btn-outline-white"
+            :class="{ 'btn-disabled': emailSent }"
+            :disabled="emailSent"
+            @click="sendVerificationEmail"
+          >
+            Send again
+          </button>
+        </div>
+      </v-infobox>
       <form ref="form" @submit.prevent="submit">
         <div>
           <label for="email">Email</label>
@@ -59,7 +61,7 @@
           </div>
           <div class="flex-1" />
           <button class="btn btn-outline" type="submit">
-            Go
+            Log in
           </button>
         </div>
       </form>
@@ -73,17 +75,28 @@
 
 <script>
 import { mapActions } from 'vuex'
+import VInfobox from '~/components/VInfobox.vue'
 
 export default {
+  components: {
+    VInfobox
+  },
   data () {
     return {
       email: '',
       password: '',
-      errorMessage: '',
+      extraInfo: '',
+      infoText: '',
+      infoType: '',
       unverified: false,
       emailSent: false,
       loadingShow: false
     }
+  },
+  mounted () {
+    this.email = this.$route.params.email
+    this.password = this.$route.params.password
+    this.extraInfo = this.$route.params.extraInfo
   },
   methods: {
     ...mapActions('auth', [
@@ -106,7 +119,8 @@ export default {
             })
           })
           .catch((e) => {
-            this.errorMessage = e.message
+            this.infoText = e.message
+            this.infoType = 'error'
             this.unverified = (e.name === 'auth-unverified')
           })
       }
@@ -117,7 +131,8 @@ export default {
         this.loadingShow = true
         await this.sendVerify({ email: this.email })
           .then((data) => {
-            this.errorMessage = 'Preview email at ' + data.preview
+            this.infoText = 'Preview email at ' + data.preview
+            this.infoType = 'info'
             this.sendSnack({
               text: 'Email sent',
               type: 'success'
@@ -125,7 +140,8 @@ export default {
           })
           .catch((e) => {
             this.emailSent = false
-            this.errorMessage = e.message
+            this.infoText = e.message
+            this.infoType = 'error'
           })
           .finally(() => {
             this.loadingShow = false

@@ -6,7 +6,7 @@
           Verify Account
         </h1>
       </div>
-      <span v-show="errorMessage" class="error-box">{{ errorMessage }}</span>
+      <v-infobox class="my-3" :text="infoText" :type="infoType" auto-empty-hide />
       <div class="text-center">
         <p class="text-xl">
           {{ status }}
@@ -22,8 +22,12 @@
 
 <script>
 import { mapActions } from 'vuex'
+import VInfobox from '~/components/VInfobox.vue'
 
 export default {
+  components: {
+    VInfobox
+  },
   middleware ({ query, redirect }) {
     if (!query.token) {
       redirect('/login')
@@ -33,7 +37,8 @@ export default {
     return {
       status: 'Verifying...',
       success: false,
-      errorMessage: ''
+      infoText: '',
+      infoType: ''
     }
   },
   async mounted () {
@@ -45,7 +50,8 @@ export default {
       .catch((e) => {
         this.status = 'Account not verified'
         this.success = false
-        this.errorMessage = e.message
+        this.infoText = e.message
+        this.infoType = 'error'
       })
   },
   methods: {

@@ -5,15 +5,6 @@ import mail from '../../mail'
 
 const router = new Router()
 
-// Manage send token and end response
-async function sendJwtToken (res, previlage, userId) {
-  const payload = { previlage, userId }
-  await auth.signJwt(payload, { expiresIn: '12h' })
-    .then(token => res.json({ payload, token }))
-    .catch(e => res.status(401).send(e))
-    .finally(() => res.end())
-}
-
 router.post('/signup', async (req, res) => {
   const { name = null, email = null, password = null } = req.body
 
@@ -22,10 +13,7 @@ router.post('/signup', async (req, res) => {
       // Make sure doesn't have existing account
       if (result.rowCount <= 0) {
         const salt = 'bf'
-        await db.queryApi('INSERT INTO users (name, email, hash) VALUES ($1, $2, crypt($3, gen_salt($4))) RETURNING id', [name, email, password, salt], res, async (result2) => {
-          // Send JWT
-          await sendJwtToken(res, 'basic', result2.rows[0].id)
-        }, { atLeastOneRow: true })
+        await db.queryApi('INSERT INTO users (name, email, hash) VALUES ($1, $2, crypt($3, gen_salt($4)))', [name, email, password, salt], res)
       } else {
         res.status(401).send({ message: 'Account already exist' })
       }
@@ -45,7 +33,14 @@ router.post('/login', async (req, res) => {
           res.status(401).send({ name: 'auth-unverified', message: 'Account is not verified' })
         } else {
           // Send JWT
-          await sendJwtToken(res, 'basic', result.rows[0].id)
+          const payload = {
+            previlage: 'basic',
+            userId: result.rows[0].id
+          }
+          await auth.signJwt(payload, { expiresIn: '12h' })
+            .then(token => res.json({ payload, token }))
+            .catch(e => res.status(401).send(e))
+            .finally(() => res.end())
         }
       } else {
         res.status(401).send({ message: 'Invalid email or password' })

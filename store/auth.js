@@ -50,14 +50,6 @@ export const actions = {
     if (getters.isAuthed) { return }
 
     return this.$axios.$post('/auth/signup', { name, email, password })
-      .then((data) => {
-        const token = data.token
-        const payload = data.payload
-        commit('SET_TOKEN', { token })
-        commit('SET_USER_DATA', { data: payload })
-        this.$router.push('/')
-        return data
-      })
   },
   login ({ commit, getters }, { email, password }) {
     if (getters.isAuthed) { return }

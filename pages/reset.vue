@@ -5,7 +5,7 @@
         Reset Password
       </h1>
       <span class="my-3 text-center">Almost there! Enter your new password and voila~</span>
-      <span v-show="errorMessage" class="error-box">{{ errorMessage }}</span>
+      <v-infobox class="my-3" :text="infoText" :type="infoType" auto-empty-hide />
       <form ref="form" @submit.prevent="submit">
         <div>
           <label for="password">New password</label>
@@ -36,8 +36,12 @@
 
 <script>
 import { mapActions } from 'vuex'
+import VInfobox from '~/components/VInfobox.vue'
 
 export default {
+  components: {
+    VInfobox
+  },
   middleware ({ query, redirect }) {
     if (!query.token) {
       redirect('/forgot')
@@ -46,7 +50,9 @@ export default {
   data () {
     return {
       password: '',
-      errorMessage: ''
+      infoText: '',
+      infoType: '',
+      resetDone: false
     }
   },
   methods: {
@@ -57,7 +63,8 @@ export default {
       'sendSnack'
     ]),
     async submit () {
-      if (this.$refs.form.checkValidity()) {
+      if (!this.resetDone && this.$refs.form.checkValidity()) {
+        this.resetDone = true
         await this.reset({
           token: this.$route.query.token,
           password: this.password
@@ -70,7 +77,9 @@ export default {
             this.$router.push('/login')
           })
           .catch((e) => {
-            this.errorMessage = e.message
+            this.resetDone = false
+            this.infoText = e.message
+            this.infoType = 'error'
           })
       }
     }
