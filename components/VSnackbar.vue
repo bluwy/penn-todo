@@ -39,7 +39,7 @@ export default {
       'snack'
     ]),
     snackColor () {
-      switch (this.type) {
+      switch (this.currentSnack.type) {
         case 'info':
           return 'bg-blue-300 text-white'
         case 'success':
