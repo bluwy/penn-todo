@@ -104,7 +104,7 @@ export default {
               text: 'Sign up successful',
               type: 'success'
             })
-            const { preview } = await this.sendVerify({ email: this.email })
+            const { preview = '' } = await this.sendVerify({ email: this.email }) || {}
             this.$router.push({
               name: 'login',
               params: {

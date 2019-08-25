@@ -90,7 +90,8 @@ export default {
       infoType: '',
       unverified: false,
       emailSent: false,
-      loadingShow: false
+      loadingShow: false,
+      loginDone: false
     }
   },
   mounted () {
@@ -107,7 +108,8 @@ export default {
       'sendSnack'
     ]),
     async submit () {
-      if (this.$refs.form.checkValidity()) {
+      if (!this.loginDone && this.$refs.form.checkValidity()) {
+        this.loginDone = true
         await this.login({
           email: this.email,
           password: this.password
@@ -119,6 +121,7 @@ export default {
             })
           })
           .catch((e) => {
+            this.loginDone = false
             this.infoText = e.message
             this.infoType = 'error'
             this.unverified = (e.name === 'auth-unverified')
