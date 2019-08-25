@@ -46,7 +46,7 @@ export const actions = {
       return Promise.reject(new Error('No token'))
     }
   },
-  signup ({ commit, getters }, { name, email, password }) {
+  signup ({ getters }, { name, email, password }) {
     if (getters.isAuthed) { return }
 
     return this.$axios.$post('/auth/signup', { name, email, password })
