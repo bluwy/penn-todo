@@ -3,7 +3,7 @@ import { Pool } from 'pg'
 // Connection string from environment variables
 const connectionString = process.env.NODE_ENV === 'test' ? process.env.DATABASE_URL_TEST : process.env.DATABASE_URL
 
-const pool = new Pool({ connectionString })
+const pool = new Pool({ connectionString, ssl: process.env.DATABASE_SSL === 'true' })
 
 export default {
   /**
