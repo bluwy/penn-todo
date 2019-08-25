@@ -1,7 +1,5 @@
 # PENN Todo
 
-> [WIP] **DO NOT release to production**
-
 [![Build Status](https://travis-ci.org/BjornLuG/penn-todo.svg?branch=master)](https://travis-ci.org/BjornLuG/penn-todo)
 
 A todo app built on the PENN stack ([PostgreSQL](https://www.postgresql.org), [Express](https://expressjs.com/), [Nuxt](https://nuxtjs.org), [Node.js](https://nodejs.org)).
@@ -10,6 +8,8 @@ A todo app built on the PENN stack ([PostgreSQL](https://www.postgresql.org), [E
 * [Architecture](#architecture)
 * [Development state](#development-state)
 * [Installation](#installation)
+  * [Project setup](#project-setup)
+  * [Database setup](#database-setup)
 * [Roadmap](#roadmap)
 * [Contributing](#contributing)
 * [FAQ](#faq)
@@ -27,7 +27,7 @@ Jest is used for unit testing, **all** tests are located in `__todos__` folder.
 
 ## Development state
 
-Currently, the todo app works. Frontend and backend works well. It only lacks more authentication functionalities, such as sending emails, resetting passwords and editing profile. UI might need a reiteration.
+The project is 90% done, only needs perfecting. Everything works, including todos database, user auth database, Express REST API, frontend interaction, etc... Currently, fake emails can be used for demos, but it still needs verification, which is sended as a link to [Ethereal](https://ethereal.email/).
 
 ## Installation
 
@@ -36,6 +36,8 @@ Dependencies not included in repo:
 * [PostgreSQL](https://www.postgresql.org) for testing local database.
 
 Make sure to have them installed.
+
+### Project setup
 
 After cloning the repo, install the required dependencies:
 
@@ -87,6 +89,76 @@ $ npm run start
 ```
 > Note: Server can only be started after build
 
+### Database setup
+
+The project uses two tables, `users` and `todos`.
+
+Table `users`:
+
+|    Column    |           Type           | Collation | Nullable |              Default              |
+|--------------|--------------------------|-----------|----------|-----------------------------------|
+| id           | integer                  |           | not null | nextval('users_id_seq'::regclass) |
+| name         | text                     |           | not null |                                   |
+| email        | text                     |           | not null |                                   |
+| hash         | text                     |           | not null |                                   |
+| verified     | boolean                  |           | not null | false                             |
+| pwd_reset_ts | timestamp with time zone |           | not null | now()                             |
+
+| Extra         | Values                                                                           |
+|---------------|----------------------------------------------------------------------------------|
+| Indexes       | "users_pkey" PRIMARY KEY, btree (id)                                             |
+| Referenced by | TABLE "todos" CONSTRAINT "fk_user_id" FOREIGN KEY (user_id) REFERENCES users(id) |
+
+Table `todos`:
+
+| Column  |  Type   | Collation | Nullable |              Default              |
+|---------|---------|-----------|----------|-----------------------------------|
+| id      | integer |           | not null | nextval('todos_id_seq'::regclass) |
+| title   | text    |           | not null |                                   |
+| done    | boolean |           | not null |                                   |
+| user_id | integer |           | not null |                                   |
+
+| Extra                   | Values                                                  |
+|-------------------------|---------------------------------------------------------|
+| Indexes                 | "todos_pkey" PRIMARY KEY, btree (id)                    |
+| Foreign-key constraints | "fk_user_id" FOREIGN KEY (user_id) REFERENCES users(id) |
+
+The database is created with pgAdmin 4, but can be created manually as follows:
+
+> Note: The commands below are retreived with `pg_dump`, so it was altered to work properly
+
+Table `users`:
+
+``` sql
+CREATE TABLE public.users
+(
+    id serial PRIMARY KEY,
+    name text NOT NULL,
+    email text NOT NULL,
+    hash text NOT NULL,
+    verified boolean NOT NULL DEFAULT false,
+    pwd_reset_ts timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT users_pkey PRIMARY KEY (id)
+)
+```
+
+Table `todos`:
+
+``` sql
+CREATE TABLE public.todos
+(
+    id serial PRIMARY KEY,
+    title text NOT NULL,
+    done boolean NOT NULL,
+    user_id integer NOT NULL,
+    CONSTRAINT todos_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_user_id FOREIGN KEY (user_id)
+        REFERENCES public.users (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+```
+
 ## Roadmap
 
 :heavy_check_mark: Done 
@@ -95,13 +167,17 @@ $ npm run start
 * Email authentication
 
 :blue_book: Todo
+* Real email authentication (Currently using Ethereal)
 * Refactor components
+* Refactor CSS
+* Refactor tests
 * Settings menu
   * Edit profile
   * Manage auth
-* Dockerize project
+* Integrate payment system
 
 :x: Cancelled
+* Dockerize project (So much hassle for Windows 10 Home)
 * Grouping todos
 * Arrangable todos
 * Online and offline mode
