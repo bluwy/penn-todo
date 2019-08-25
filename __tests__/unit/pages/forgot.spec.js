@@ -35,12 +35,13 @@ describe('Page Forgot', () => {
     wrapper.find('form').trigger('submit')
     expect(authActions.forgot).toBeCalled()
 
+    wrapper.setData({ emailSent: false })
     authActions.forgot.mockClear()
     authActions.forgot.mockRejectedValue(new Error('Error'))
     wrapper.find('form').trigger('submit')
     await wrapper.vm.$nextTick()
     expect(authActions.forgot).toBeCalled()
-    expect(wrapper.vm.errorMessage).toBe('Error')
+    expect(wrapper.vm.infoText).toBe('Error')
   })
 
   it('should not submit to store if fields are invalid', async () => {

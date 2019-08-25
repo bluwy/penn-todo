@@ -32,7 +32,8 @@ describe('API Route Auth', () => {
         name text NOT NULL,
         email text NOT NULL,
         hash text NOT NULL,
-        verified boolean DEFAULT false NOT NULL
+        verified boolean DEFAULT false NOT NULL,
+        pwd_reset_ts timestamptz DEFAULT now() NOT NULL
       )`
     )
   })
@@ -51,12 +52,10 @@ describe('API Route Auth', () => {
 
   describe('POST /signup', () => {
     it('should signup a user given correct credentials', async () => {
-      expect.assertions(3)
+      expect.assertions(1)
       auth.signJwt.mockResolvedValue('correctToken')
       const res = await request(app).post('/auth/signup').send(userData)
       expect(res.status).toBe(200)
-      expect(res.body.payload).toHaveProperty('userId', 1)
-      expect(res.body.token).toBeTruthy()
     })
 
     it('should not signup user if user is already registered', async () => {
@@ -109,10 +108,19 @@ describe('API Route Auth', () => {
   describe('POST /check', () => {
     it('should login and check a user given correct credentials', async () => {
       expect.assertions(2)
-      auth.verifyJwt.mockResolvedValue({ userId: 1 })
+      await addUser()
+      auth.verifyJwt.mockResolvedValue({ userId: 1, iat: (Date.now() / 1000 + 810) })
       const res2 = await request(app).post('/auth/check').send({ token: 'correctToken' })
       expect(res2.status).toBe(200)
       expect(res2.body).toHaveProperty('userId', 1)
+    })
+
+    it('should not login and check a user given correct credentials but token expired', async () => {
+      expect.assertions(1)
+      await addUser()
+      auth.verifyJwt.mockResolvedValue({ userId: 1, iat: 0 })
+      const res = await request(app).post('/auth/check').send({ token: 'expiredToken' })
+      expect(res.status).toBe(401)
     })
 
     it('should login and check error a user given wrong credentials', async () => {

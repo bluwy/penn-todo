@@ -46,6 +46,17 @@ describe('Component VSnackbar', () => {
     expect(wrapper.vm.show).toBeFalsy()
   })
 
+  it('should have color for all defined types', () => {
+    const wrapper = shallowMount(VSnackbar, { store, localVue })
+    const types = ['info', 'success', 'warning', 'error', 'default']
+    types.forEach((type) => {
+      wrapper.setData({
+        currentSnack: { type }
+      })
+      expect(wrapper.vm.snackColor).toBeTruthy()
+    })
+  })
+
   it('should call next if exist when close button clicked', () => {
     const wrapper = shallowMount(VSnackbar, { store, localVue })
     // Plain call, nothing should happen since next doesn't exist (For code coverage)

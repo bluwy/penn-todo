@@ -66,6 +66,6 @@ describe('Page Verify', () => {
     await wrapper.vm.$nextTick()
     expect(authActions.verify).toBeCalled()
     expect(wrapper.vm.success).toBeFalsy()
-    expect(wrapper.vm.errorMessage).toBe('Error')
+    expect(wrapper.vm.infoText).toBe('Error')
   })
 })

@@ -7,6 +7,7 @@ localVue.use(Vuex)
 
 describe('Page Reset', () => {
   let authActions
+  let snackbarActions
   let store
   let mocks
 
@@ -14,11 +15,18 @@ describe('Page Reset', () => {
     authActions = {
       reset: jest.fn().mockResolvedValue()
     }
+    snackbarActions = {
+      sendSnack: jest.fn()
+    }
     store = new Vuex.Store({
       modules: {
         auth: {
           namespaced: true,
           actions: authActions
+        },
+        snackbar: {
+          namespaced: true,
+          actions: snackbarActions
         }
       }
     })
@@ -69,7 +77,7 @@ describe('Page Reset', () => {
     wrapper.find('form').trigger('submit')
     await wrapper.vm.$nextTick()
     expect(authActions.reset).toBeCalled()
-    expect(wrapper.vm.errorMessage).toBe('Error')
+    expect(wrapper.vm.infoText).toBe('Error')
   })
 
   it('should not submit to store if fields are invalid', async () => {
