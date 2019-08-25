@@ -54,12 +54,17 @@ DATABASE_URL=
 ; Testing database url, e.g. postgres://john:12345678@localhost:5432/todotestdb
 DATABASE_URL_TEST=
 
+; Set 'true' without quotes to enable database SSL access, any other values will equal to false
+DATABASE_SSL=
+
 ; Backend api url,  used by Nuxt for Axios' `baseUrl`. You can leave the value below as is.
 API_URL_BROWSER=http://localhost:3000/api
 
 ; Secret string used for JWT hashing
 JWT_SECRET=
 ```
+
+> Note: In the `.env` file, remove the comments as dotenv doesn't support it
 
 To run dev server (This starts Nuxt and Express servers):
 ``` bash
@@ -123,9 +128,7 @@ Table `todos`:
 | Indexes                 | "todos_pkey" PRIMARY KEY, btree (id)                    |
 | Foreign-key constraints | "fk_user_id" FOREIGN KEY (user_id) REFERENCES users(id) |
 
-The database is created with pgAdmin 4, but can be created manually as follows:
-
-> Note: The commands below are retreived with `pg_dump`, so it was altered to work properly
+The database is created with pgAdmin 4, but can be created manually with `psql` as follows:
 
 Table `users`:
 
@@ -137,9 +140,8 @@ CREATE TABLE public.users
     email text NOT NULL,
     hash text NOT NULL,
     verified boolean NOT NULL DEFAULT false,
-    pwd_reset_ts timestamptz NOT NULL DEFAULT now(),
-    CONSTRAINT users_pkey PRIMARY KEY (id)
-)
+    pwd_reset_ts timestamptz NOT NULL DEFAULT now()
+);
 ```
 
 Table `todos`:
@@ -151,13 +153,12 @@ CREATE TABLE public.todos
     title text NOT NULL,
     done boolean NOT NULL,
     user_id integer NOT NULL,
-    CONSTRAINT todos_pkey PRIMARY KEY (id),
     CONSTRAINT fk_user_id FOREIGN KEY (user_id)
         REFERENCES public.users (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-)
+);
 ```
+
+> Note: After creating the tables, you can run `\d users` and `\d todos` to each display the table properties. It should match the markdown tables above.
 
 ## Roadmap
 

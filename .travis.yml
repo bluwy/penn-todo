@@ -1,8 +1,13 @@
 language: node_js
 node_js:
-  - "lts/*"
+- lts/*
 cache: npm
 services:
-  - postgresql
+- postgresql
 before_script:
-  - psql -c 'CREATE DATABASE travis_ci_test;' -U postgres
+- psql -c 'CREATE DATABASE travis_ci_test;' -U postgres
+deploy:
+  provider: heroku
+  api_key:
+    secure: ikY8429Owi/58bbjk+OIko6CxTpuVZ3/f2F4Y7ZwkHmsnBxzt//sM1UQAs4vkdLh+qq1gkpOfN5EA2Oh2j0NDoXr2Tyv2BGewUIuvjbczaQMyUShvJ8rsaqHCGEBtELzu/Ce8QIpPdoOAX+8lKUXIYd43bHKIz447Ok5QnqaFjuPLXEpoSothk2H/j4O4BbjuCkw88xL2vPozKQA06aIAS+tvtiDD34PYddtF3mhceAVBcT3kusuMiHq9SLg6P4PtQ+0gtGmMk49TUrwa+IMfDCTvwtHKLHhxeqVBmQi9ENAID0OSzAJXXeJtKMfRA1w7mtXc6TzkBQVh0EfbQsJESMoufhR1ace5FkfF2ZHZ7gkxO3HMklAIRMKEuHBVaMPkW3IFujDTz1VhY8QEkVUcyOe5NkLuIWHA3nJJg7jtabQKTgSFhs/CYrqbFSChfUeEi+lEb2SozYoc2v6x+JJXUcrRQA7nsHzXxJClhDzPKhohZUw9huRNXzoviWVeusHt+ebq1j3OZSWFGHMIoTbUWSaTnNduBsF34tVBjj480iUihpv3Kucyvy8FKWbwmPduXqGpg0V4f2+AMyqnejXiA8p9n884+fJybPX+zWVKYIo7Ik3x3/5RZZvqLDwcsN3bW/XSXQX54n/pDPRIMG22SxfpHhX20yxDQbACXc95Y0=
+  app: penn-todo
