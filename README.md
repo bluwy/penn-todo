@@ -4,6 +4,16 @@
 
 A todo app built on the PENN stack ([PostgreSQL](https://www.postgresql.org), [Express](https://expressjs.com/), [Nuxt](https://nuxtjs.org), [Node.js](https://nodejs.org)).
 
+## Demo
+
+A demo can be found at https://penn-todo.herokuapp.com. Currently, you can sign up a new account without a real email, since verification emails are being sent with [Ethereal](https://ethereal.email/). 
+
+You can log in with a demo account too:
+* Email: d@m.o
+* Password: demo
+
+Feel free to open an issue for any bugs and quirks :)
+
 ## Table of contents
 * [Architecture](#architecture)
 * [Development state](#development-state)
@@ -23,7 +33,7 @@ Express acts as the server middleware for Nuxt, so Nuxt will redirect api calls 
 
 Express does CRUD operations on a PostgreSQL database. Authentication is needed to do so, and is based on JSON Web Token (JWT).
 
-Jest is used for unit testing, **all** tests are located in `__todos__` folder.
+Jest is used for unit testing, **all** tests are located in `__tests__` folder.
 
 ## Development state
 
