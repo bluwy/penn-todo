@@ -34,6 +34,9 @@ export default {
     { src: '~/plugins/axios.js', mode: 'client' },
     { src: '~/plugins/nuxt-client-init.js', mode: 'client' }
   ],
+  router: {
+    middleware: ['route']
+  },
   /*
   ** Nuxt.js dev-modules
   */

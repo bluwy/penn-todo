@@ -6,7 +6,9 @@
 import Todo from '~/components/Todo.vue'
 
 export default {
-  middleware: 'auth',
+  meta: {
+    requireAuth: true
+  },
   components: {
     Todo
   },

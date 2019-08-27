@@ -78,7 +78,9 @@ import { mapActions } from 'vuex'
 import VInfobox from '~/components/VInfobox.vue'
 
 export default {
-  middleware: 'auth-done',
+  meta: {
+    avoidIfAuth: true
+  },
   components: {
     VInfobox
   },
