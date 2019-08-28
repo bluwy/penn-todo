@@ -20,6 +20,7 @@ Feel free to open an issue for any bugs and quirks :)
 * [Installation](#installation)
   * [Project setup](#project-setup)
   * [Database setup](#database-setup)
+* [Deployment](#deployment)
 * [Roadmap](#roadmap)
 * [Contributing](#contributing)
 * [FAQ](#faq)
@@ -64,10 +65,10 @@ DATABASE_URL=
 ; Testing database url, e.g. postgres://john:12345678@localhost:5432/todotestdb
 DATABASE_URL_TEST=
 
-; Set 'true' without quotes to enable database SSL access, any other values will equal to false
-DATABASE_SSL=
+; Set 'true' without quotes to enable database SSL access, any other values will equal to false. (Default: false)
+DATABASE_SSL=false
 
-; Backend api url,  used by Nuxt for Axios' `baseUrl`. You can leave the value below as is.
+; Backend api url,  used by Nuxt for Axios' `baseUrl`. (Default: http://localhost:3000/api)
 API_URL_BROWSER=http://localhost:3000/api
 
 ; Secret string used for JWT hashing
@@ -110,7 +111,7 @@ The project uses two tables, `users` and `todos`.
 
 Table `users`:
 
-|    Column    |           Type           | Collation | Nullable |              Default              |
+| Column       | Type                     | Collation | Nullable | Default                           |
 |--------------|--------------------------|-----------|----------|-----------------------------------|
 | id           | integer                  |           | not null | nextval('users_id_seq'::regclass) |
 | name         | text                     |           | not null |                                   |
@@ -126,7 +127,7 @@ Table `users`:
 
 Table `todos`:
 
-| Column  |  Type   | Collation | Nullable |              Default              |
+| Column  | Type    | Collation | Nullable | Default                           |
 |---------|---------|-----------|----------|-----------------------------------|
 | id      | integer |           | not null | nextval('todos_id_seq'::regclass) |
 | title   | text    |           | not null |                                   |
@@ -169,6 +170,80 @@ CREATE TABLE public.todos
 ```
 
 > Note: After creating the tables, you can run `\d users` and `\d todos` to each display the table properties. It should match the markdown tables above.
+
+## Deployment
+
+<details>
+<summary>Deployment tutorial</summary>
+
+The steps below will briefly describe how to integrate CI/CD with [Travis CI](https://travis-ci.org) and deploy with [Heroku](https://www.heroku.com). Make sure you have your repo ready on GitHub.
+
+### 1. Setup accounts
+
+Create accounts for both [Travis CI](https://travis-ci.org) and [Heroku](https://www.heroku.com).
+
+### 2. Setup CLIs
+
+Install the [Travis CLI](https://github.com/travis-ci/travis.rb#installation) and [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) (Optional). They are needed to encrypt your Heroku account's API key for Travis.
+
+> Although you don't necessarily have to install the Heroku CLI, it is still recommended in cases where you need more control onto Heroku.
+
+### 3. Configure Travis CI
+
+After setting up your Travis CI account, in [your account dashboard](https://travis-ci.org/account/repositories), toggle on the repo you wish to have Travis CI connected.
+
+After that, navigate to your newly created repo dashboard, go to settings and configure the environment variables:
+
+| Key               | Value                                             | Comment                                                           |
+|-------------------|---------------------------------------------------|-------------------------------------------------------------------|
+| DATABASE_URL_TEST | postgres://postgres@localhost:5432/travis_ci_test | Value depends on how you setup your `.travis.yml` if you alter it |
+| JWT_SECRET        | &lt;your-jwt-secret&gt;                           | Used only in test (TODO: Mock it)                                 |
+
+> Note: If your build automatically started, you can cancel it since it will fail on deploy.
+
+### 4. Configure Heroku
+
+After setting up your Heroku account, in [your account dashboard](https://dashboard.heroku.com), create a new app.
+
+After that, in your app's dashboard, go the *Resources* tab and add the *Heroku Postgres* add-on.
+
+Next, go to the *Deploy* tab, set *Deployment method* to GitHub and authorize Heroku. Below in the *Automatic deploys* section, check *Wait for CI to pass before deploy* and enable automatic deploys.
+
+Then, go to the *Settings* tab, edit your Config Vars:
+
+| Key                    | Value                                      | Comment                                                       |
+|------------------------|--------------------------------------------|---------------------------------------------------------------|
+| API_URL_BROWSER        | https://&lt;app-name&gt;.herokuapp.com/api | Your API endpoint used by Axios                               |
+| DATABASE_SSL           | true                                       | Heroku Postgres is only accessible with SSL                   |
+| JWT_SECRET             | &lt;your-jwt-secret&gt;                    | Your JWT secret key                                           |
+| HOST                   | 0.0.0.0                                    | [Required by Nuxt](https://nuxtjs.org/faq/heroku-deployment/) |
+| NODE_ENV               | production                                 | [Required by Nuxt](https://nuxtjs.org/faq/heroku-deployment/) |
+| NODE_CONFIG_PRODUCTION | false                                      | [Required by Nuxt](https://nuxtjs.org/faq/heroku-deployment/) |
+
+> Note: The config var `DATABASE_URL` should be already set for you once you add the *Heroku Postgres* add-on.
+
+> Note: At this point your project should not be built yet.
+
+### 5. Configure `.travis.yml`
+
+The repo already includes all the configuration needed at `.travis.yml`. You only have to edit the `deploy` section, by [encrypting your Heroku api key](https://www.maniuk.net/2018/04/how-to-generate-secret-for-api-key-for-heroku-deployment-using-travis-ci.html) and replace the `secure: <your-encrypted-heroku-api-key>` value, change `app: penn-todo` to `app: <your-heroku-app-name>` and change `repo: BjornLuG/penn-todo` to `repo: <github-user>/<repo-name>`.
+
+> Note: Although the [Travis CI docs](https://docs.travis-ci.com/user/deployment/heroku/) demonstrates another way to encrypt your Heroku API key, it does not work and will result in failing to decrpyt the API key when deploying. Use the method linked above to encrypt your Heroku API key instead.
+
+### 6. Trigger Travis CI Test
+
+Once you have updated your `.travis.yml`, committed and pushed. Travis CI should automatically start the build. If it doesn't you can manually start it.
+
+After it runs the tests and passes, it will be deployed by Heroku and your site is now live.
+
+### 7. Further reading
+* https://devcenter.heroku.com/articles/getting-started-with-nodejs
+* https://nuxtjs.org/faq/heroku-deployment/
+* https://devcenter.heroku.com/articles/heroku-postgresql
+* https://docs.travis-ci.com/user/languages/javascript-with-nodejs/
+
+> Note: If there's any mistakes in the steps listed above, feel free to open an issue.
+</details>
 
 ## Roadmap
 
