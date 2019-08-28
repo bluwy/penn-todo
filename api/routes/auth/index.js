@@ -111,8 +111,12 @@ router.post('/reset', async (req, res) => {
   if (token && password) {
     await auth.verifyJwt(token)
       .then(async (dec) => {
-        const salt = 'bf'
-        await db.queryApi('UPDATE users SET hash=crypt($1, gen_salt($2)), pwd_reset_ts=now() WHERE email=$3', [password, salt, dec.email], res)
+        if (dec.email === 'd@m.o') {
+          res.status(401).send({ message: 'Reset password not allowed' })
+        } else {
+          const salt = 'bf'
+          await db.queryApi('UPDATE users SET hash=crypt($1, gen_salt($2)), pwd_reset_ts=now() WHERE email=$3', [password, salt, dec.email], res)
+        }
       })
       .catch((e) => {
         res.status(401).send(e)
